@@ -9,85 +9,155 @@ const server = http.createServer((req, res) => {
   const contentType = ext === ".html" ? "text/html" : "text/plain";
 
   fs.readFile(filePath, (err, data) => {
-    if (err) {
-      res.writeHead(404);
-      res.end("Not found");
-      return;
-    }
+    if (err) { res.writeHead(404); res.end("Not found"); return; }
     res.writeHead(200, { "Content-Type": contentType });
     res.end(data);
   });
 });
 
-const io = new Server(server, {
-  cors: { origin: "*" }
-});
+const io = new Server(server, { cors: { origin: "*" } });
 
-// ─── State ───────────────────────────────────────────────────────────────────
-const rooms = {}; // roomId → { players: [{ id, name, choice }], status }
+// ─── Config ───────────────────────────────────────────────────────────────────
+const CHOICE_TIME = 10; // seconds to make a choice
+
+// ─── State ────────────────────────────────────────────────────────────────────
+const rooms   = {}; // roomId → { players, status, round, scores, timers }
 const players = {}; // socketId → { name, roomId }
 
 function log(msg) {
-  const time = new Date().toLocaleTimeString("vi-VN");
-  console.log(`\x1b[36m[${time}]\x1b[0m ${msg}`);
+  const t = new Date().toLocaleTimeString("vi-VN");
+  console.log(`\x1b[36m[${t}]\x1b[0m ${msg}`);
 }
 
 function roomInfo(roomId) {
   const r = rooms[roomId];
   if (!r) return "—";
-  const names = r.players.map((p) => p.name).join(" vs ");
+  const names = r.players.map(p => p.name).join(" vs ");
   return `Phòng \x1b[33m${roomId}\x1b[0m [${r.players.length}/2] ${names}`;
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 function getResult(a, b) {
-  // a, b: 'rock'|'paper'|'scissors'
   if (a === b) return "draw";
-  if (
-    (a === "rock" && b === "scissors") ||
-    (a === "scissors" && b === "paper") ||
-    (a === "paper" && b === "rock")
-  )
-    return "win";
+  if ((a==="rock"&&b==="scissors")||(a==="scissors"&&b==="paper")||(a==="paper"&&b==="rock")) return "win";
   return "lose";
 }
 
-const EMOJI = { rock: "✊", paper: "✋", scissors: "✌️" };
-const VI = { rock: "Búa", paper: "Bao", scissors: "Kéo" };
+const EMOJI = { rock:"✊", paper:"✋", scissors:"✌️" };
+const VI    = { rock:"Búa", paper:"Bao", scissors:"Kéo" };
+
+// ─── Timer helpers ────────────────────────────────────────────────────────────
+function clearRoomTimers(room) {
+  if (room.countdownInterval) { clearInterval(room.countdownInterval); room.countdownInterval = null; }
+  if (room.timeoutTimer)      { clearTimeout(room.timeoutTimer);       room.timeoutTimer = null; }
+}
+
+function startChoiceTimer(roomId) {
+  const room = rooms[roomId];
+  if (!room) return;
+
+  clearRoomTimers(room);
+
+  let remaining = CHOICE_TIME;
+  io.to(roomId).emit("timerStart", { seconds: CHOICE_TIME });
+
+  room.countdownInterval = setInterval(() => {
+    remaining--;
+    io.to(roomId).emit("timerTick", { remaining });
+
+    if (remaining <= 0) {
+      clearInterval(room.countdownInterval);
+      room.countdownInterval = null;
+    }
+  }, 1000);
+
+  room.timeoutTimer = setTimeout(() => {
+    clearInterval(room.countdownInterval);
+    room.countdownInterval = null;
+    if (!room || room.status !== "playing") return;
+
+    if (room.bothChose) {
+      // Both chose in time — just resolve normally
+      room.bothChose = false;
+      resolveRound(roomId);
+      return;
+    }
+
+    // Force random choice for those who haven't chosen
+    room.players.forEach(p => {
+      if (!p.choice) {
+        p.timedOut = true;
+        p.choice = ["rock","paper","scissors"][Math.floor(Math.random() * 3)];
+        io.to(p.id).emit("timedOut");
+        log(`\x1b[31mHẾT GIỜ\x1b[0m  ${p.name} không chọn — phòng ${roomId}`);
+      }
+    });
+
+    resolveRound(roomId);
+  }, CHOICE_TIME * 1000);
+}
+
+function resolveRound(roomId) {
+  const room = rooms[roomId];
+  if (!room) return;
+  const [p1, p2] = room.players;
+  if (!p1.choice || !p2.choice) return;
+
+  const r1 = getResult(p1.choice, p2.choice);
+  const r2 = r1 === "draw" ? "draw" : r1 === "win" ? "lose" : "win";
+
+  // Timed-out players automatically lose (override draw if one timed out)
+  let finalR1 = r1, finalR2 = r2;
+  if (p1.timedOut && !p2.timedOut) { finalR1 = "lose"; finalR2 = "win"; }
+  else if (!p1.timedOut && p2.timedOut) { finalR1 = "win";  finalR2 = "lose"; }
+
+  if (finalR1 === "win")       room.scores[p1.id] = (room.scores[p1.id]||0) + 1;
+  else if (finalR2 === "win")  room.scores[p2.id] = (room.scores[p2.id]||0) + 1;
+
+  const roundResult = {
+    round: room.round,
+    choices:  { [p1.id]: p1.choice,  [p2.id]: p2.choice  },
+    results:  { [p1.id]: finalR1,    [p2.id]: finalR2     },
+    timedOut: { [p1.id]: !!p1.timedOut, [p2.id]: !!p2.timedOut },
+    scores:   { [p1.id]: room.scores[p1.id]||0, [p2.id]: room.scores[p2.id]||0 },
+    players:  [{ id: p1.id, name: p1.name }, { id: p2.id, name: p2.name }],
+  };
+
+  io.to(roomId).emit("roundResult", roundResult);
+
+  const sym = finalR1==="win"?">":(finalR1==="lose"?"<":"=");
+  log(`  Kết quả vòng ${room.round}: ${p1.name}(${EMOJI[p1.choice]}${p1.timedOut?"⏰":""}) ${sym} ${p2.name}(${EMOJI[p2.choice]}${p2.timedOut?"⏰":""}) | ${room.scores[p1.id]||0}-${room.scores[p2.id]||0}`);
+
+  // Reset for next round
+  p1.choice = null; p1.timedOut = false;
+  p2.choice = null; p2.timedOut = false;
+  room.round++;
+}
 
 // ─── Socket events ────────────────────────────────────────────────────────────
 io.on("connection", (socket) => {
   log(`\x1b[32m+\x1b[0m Kết nối mới: \x1b[35m${socket.id}\x1b[0m`);
 
-  // ── join / create room ──────────────────────────────────────────────────────
   socket.on("joinRoom", ({ name, roomId }) => {
-    name = (name || "Ẩn danh").trim().slice(0, 20);
+    name   = (name   || "Ẩn danh").trim().slice(0, 20);
     roomId = (roomId || "").trim().toUpperCase().slice(0, 8);
+    if (!roomId) roomId = Math.random().toString(36).slice(2, 6).toUpperCase();
 
-    if (!roomId) {
-      // Generate a random room ID
-      roomId = Math.random().toString(36).slice(2, 6).toUpperCase();
-    }
-
-    // Validate player count
     if (rooms[roomId] && rooms[roomId].players.length >= 2) {
       socket.emit("error", "Phòng đã đầy (2/2)!");
       log(`✗ ${name} cố vào phòng đầy: ${roomId}`);
       return;
     }
 
-    // Register player
     players[socket.id] = { name, roomId };
     socket.join(roomId);
 
     if (!rooms[roomId]) {
-      rooms[roomId] = { players: [], status: "waiting", round: 0, scores: {} };
+      rooms[roomId] = { players:[], status:"waiting", round:1, scores:{}, rematchVotes:null };
     }
 
     const room = rooms[roomId];
-    room.players.push({ id: socket.id, name, choice: null });
+    room.players.push({ id: socket.id, name, choice: null, timedOut: false });
     room.scores[socket.id] = 0;
-
     socket.emit("joinedRoom", { roomId, name });
 
     if (room.players.length === 1) {
@@ -95,70 +165,64 @@ io.on("connection", (socket) => {
       log(`\x1b[34mTạo\x1b[0m  ${roomInfo(roomId)} — chủ phòng: ${name}`);
     } else {
       room.status = "playing";
-      room.round = 1;
-      const names = room.players.map((p) => p.name);
-      io.to(roomId).emit("gameStart", {
-        players: names,
-        round: room.round,
-      });
+      room.round  = 1;
+      const names = room.players.map(p => p.name);
       log(`\x1b[32mBắt đầu\x1b[0m ${roomInfo(roomId)}`);
+
+      // Send gameStart, then after countdown client fires readyToPlay
+      io.to(roomId).emit("gameStart", { players: names, round: room.round });
+
+      // Wait for game intro animation (3s) before starting timer
+      setTimeout(() => {
+        if (rooms[roomId] && rooms[roomId].status === "playing") {
+          io.to(roomId).emit("roundBegin", { round: room.round });
+          startChoiceTimer(roomId);
+          log(`  ⏱ Bắt đầu đếm ${CHOICE_TIME}s — phòng ${roomId}`);
+        }
+      }, 3500);
     }
   });
 
-  // ── player choice ───────────────────────────────────────────────────────────
   socket.on("choose", (choice) => {
     const pInfo = players[socket.id];
     if (!pInfo) return;
-
     const { roomId } = pInfo;
     const room = rooms[roomId];
     if (!room || room.status !== "playing") return;
-
-    const player = room.players.find((p) => p.id === socket.id);
-    if (!player || player.choice) return; // already chose
+    const player = room.players.find(p => p.id === socket.id);
+    if (!player || player.choice) return;
 
     player.choice = choice;
-    log(
-      `\x1b[33m${pInfo.name}\x1b[0m chọn \x1b[35m${EMOJI[choice]} ${VI[choice]}\x1b[0m — phòng ${roomId}`
-    );
-
-    // Notify the other player that this player has chosen (but not what)
+    log(`\x1b[33m${pInfo.name}\x1b[0m chọn \x1b[35m${EMOJI[choice]} ${VI[choice]}\x1b[0m — phòng ${roomId}`);
     socket.to(roomId).emit("opponentChose");
 
-    // Check if both chose
-    const [p1, p2] = room.players;
-    if (p1.choice && p2.choice) {
-      const r1 = getResult(p1.choice, p2.choice);
-      const r2 = r1 === "draw" ? "draw" : r1 === "win" ? "lose" : "win";
-
-      if (r1 === "win") room.scores[p1.id] = (room.scores[p1.id] || 0) + 1;
-      else if (r2 === "win") room.scores[p2.id] = (room.scores[p2.id] || 0) + 1;
-
-      const roundResult = {
-        round: room.round,
-        choices: { [p1.id]: p1.choice, [p2.id]: p2.choice },
-        results: { [p1.id]: r1, [p2.id]: r2 },
-        scores: { [p1.id]: room.scores[p1.id], [p2.id]: room.scores[p2.id] },
-        players: [
-          { id: p1.id, name: p1.name },
-          { id: p2.id, name: p2.name },
-        ],
-      };
-
-      io.to(roomId).emit("roundResult", roundResult);
-
-      log(
-        `  Kết quả: ${p1.name}(${EMOJI[p1.choice]}) ${r1 === "win" ? ">" : r1 === "lose" ? "<" : "="} ${p2.name}(${EMOJI[p2.choice]}) | Tỉ số ${room.scores[p1.id]}-${room.scores[p2.id]}`
-      );
-
-      // Reset choices, increment round
-      p1.choice = null;
-      p2.choice = null;
-      room.round += 1;
+    if (room.players.every(p => p.choice)) {
+      // Do NOT clear the timer — let it run to 0 naturally for suspense.
+      // resolveRound will be called by the timeout handler when time is up.
+      // Mark the room so timeout handler knows to resolve (not force choices).
+      room.bothChose = true;
     }
   });
 
-  // ── rematch ─────────────────────────────────────────────────────────────────
+  // Client signals ready for next round
+  socket.on("nextRound", () => {
+    const pInfo = players[socket.id];
+    if (!pInfo) return;
+    const { roomId } = pInfo;
+    const room = rooms[roomId];
+    if (!room) return;
+
+    if (!room.nextRoundVotes) room.nextRoundVotes = new Set();
+    room.nextRoundVotes.add(socket.id);
+
+    if (room.nextRoundVotes.size >= room.players.length) {
+      room.nextRoundVotes.clear();
+      io.to(roomId).emit("roundBegin", { round: room.round });
+      startChoiceTimer(roomId);
+      log(`  ▶ Vòng ${room.round} bắt đầu — phòng ${roomId}`);
+    }
+  });
+
   socket.on("rematch", () => {
     const pInfo = players[socket.id];
     if (!pInfo) return;
@@ -172,36 +236,35 @@ io.on("connection", (socket) => {
 
     if (room.rematchVotes.size >= 2) {
       room.rematchVotes.clear();
+      clearRoomTimers(room);
       room.scores = {};
-      room.players.forEach((p) => {
-        p.choice = null;
-        room.scores[p.id] = 0;
-      });
-      room.round = 1;
+      room.players.forEach(p => { p.choice=null; p.timedOut=false; room.scores[p.id]=0; });
+      room.round  = 1;
       room.status = "playing";
-      io.to(roomId).emit("gameStart", {
-        players: room.players.map((p) => p.name),
-        round: room.round,
-        isRematch: true,
-      });
+      room.bothChose = false;
+      io.to(roomId).emit("gameStart", { players: room.players.map(p=>p.name), round: 1, isRematch: true });
+      setTimeout(() => {
+        if (rooms[roomId]) {
+          io.to(roomId).emit("roundBegin", { round: 1 });
+          startChoiceTimer(roomId);
+        }
+      }, 3500);
       log(`🔄 Chơi lại — ${roomInfo(roomId)}`);
     } else {
       socket.to(roomId).emit("rematchRequest", pInfo.name);
     }
   });
 
-  // ── disconnect ──────────────────────────────────────────────────────────────
   socket.on("disconnect", () => {
     const pInfo = players[socket.id];
     if (pInfo) {
       const { name, roomId } = pInfo;
       log(`\x1b[31m-\x1b[0m Ngắt kết nối: \x1b[35m${name}\x1b[0m (${socket.id})`);
-
       const room = rooms[roomId];
       if (room) {
-        room.players = room.players.filter((p) => p.id !== socket.id);
+        clearRoomTimers(room);
+        room.players = room.players.filter(p => p.id !== socket.id);
         delete room.scores[socket.id];
-
         if (room.players.length === 0) {
           delete rooms[roomId];
           log(`🗑  Phòng ${roomId} đã xóa (trống)`);
@@ -218,10 +281,10 @@ io.on("connection", (socket) => {
   });
 });
 
-// ─── Start ────────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`\n\x1b[1m\x1b[32m✔ Server Kéo Búa Bao đang chạy\x1b[0m`);
   console.log(`  \x1b[34m➜  http://localhost:${PORT}\x1b[0m\n`);
+  console.log(`  ⏱  Thời gian chọn: \x1b[33m${CHOICE_TIME}s\x1b[0m mỗi vòng\n`);
   console.log(`\x1b[90m${"─".repeat(50)}\x1b[0m`);
 });

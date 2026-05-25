@@ -40,382 +40,400 @@
     overflow-x: hidden;
   }
 
-  /* Animated background grid */
   body::before {
     content: '';
-    position: fixed;
-    inset: 0;
+    position: fixed; inset: 0;
     background-image:
       linear-gradient(var(--border) 1px, transparent 1px),
       linear-gradient(90deg, var(--border) 1px, transparent 1px);
     background-size: 40px 40px;
-    opacity: 0.3;
-    z-index: 0;
+    opacity: 0.3; z-index: 0;
   }
 
-  .wrap {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 480px;
-  }
+  .wrap { position: relative; z-index: 1; width: 100%; max-width: 480px; }
 
   /* ── Logo ── */
-  .logo {
-    text-align: center;
-    margin-bottom: 32px;
-  }
+  .logo { text-align: center; margin-bottom: 32px; }
   .logo h1 {
-    font-family: 'Lilita One', cursive;
-    font-size: 2.6rem;
+    font-family: 'Lilita One', cursive; font-size: 2.6rem;
     background: linear-gradient(135deg, var(--rock), var(--scissors), var(--paper));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     line-height: 1;
   }
-  .logo p {
-    color: var(--muted);
-    font-size: .9rem;
-    margin-top: 6px;
-    letter-spacing: .05em;
-  }
+  .logo p { color: var(--muted); font-size: .9rem; margin-top: 6px; letter-spacing: .05em; }
   .emoji-row { font-size: 1.8rem; margin-bottom: 8px; animation: float 3s ease-in-out infinite; }
   @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
 
   /* ── Card ── */
   .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 28px;
-    backdrop-filter: blur(12px);
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 20px; padding: 28px; backdrop-filter: blur(12px);
   }
 
   /* ── Screens ── */
   .screen { display: none; }
   .screen.active { display: block; }
 
-  /* ── Form elements ── */
+  /* ── Form ── */
   label {
-    display: block;
-    font-size: .8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    color: var(--muted);
-    margin-bottom: 6px;
+    display: block; font-size: .8rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 6px;
   }
   input[type=text] {
-    width: 100%;
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
+    width: 100%; background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 10px; color: var(--text);
     font-family: "Fira Code", "JetBrains Mono", Consolas, Monaco, monospace;
-    font-size: 1rem;
-    font-weight: 700;
-    padding: 12px 16px;
-    outline: none;
-    transition: border-color .2s, box-shadow .2s;
-    margin-bottom: 20px;
+    font-size: 1rem; font-weight: 700; padding: 12px 16px; outline: none;
+    transition: border-color .2s, box-shadow .2s; margin-bottom: 20px;
   }
-  input[type=text]:focus {
-    border-color: var(--scissors);
-    box-shadow: 0 0 0 3px #a855f730;
-  }
+  input[type=text]:focus { border-color: var(--scissors); box-shadow: 0 0 0 3px #a855f730; }
   input[type=text]::placeholder { color: var(--muted); font-weight: 400; }
 
   /* ── Buttons ── */
   .btn {
-    display: block;
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 12px;
+    display: block; width: 100%; padding: 14px; border: none; border-radius: 12px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 1.1rem;
-    letter-spacing: .04em;
-    cursor: pointer;
-    transition: transform .15s, box-shadow .15s, filter .15s;
-    margin-top: 10px;
+    font-size: 1.1rem; letter-spacing: .04em; cursor: pointer;
+    transition: transform .15s, box-shadow .15s, filter .15s; margin-top: 10px;
   }
   .btn:active { transform: scale(.97); }
-  .btn-primary {
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
-    color: #fff;
-    box-shadow: 0 4px 20px #a855f740;
-  }
-  .btn-primary:hover { box-shadow: 0 6px 28px #a855f760; filter: brightness(1.1); }
-  .btn-secondary {
-    background: linear-gradient(135deg, #0e7490, #06b6d4);
-    color: #fff;
-    box-shadow: 0 4px 20px #06b6d440;
-  }
-  .btn-secondary:hover { filter: brightness(1.1); }
-  .btn-danger {
-    background: linear-gradient(135deg, #be123c, #f43f5e);
-    color: #fff;
-  }
-  .btn-sm {
-    display: inline-block;
-    width: auto;
-    padding: 10px 24px;
-    font-size: .95rem;
-  }
+  .btn-primary { background: linear-gradient(135deg,#7c3aed,#a855f7); color:#fff; box-shadow:0 4px 20px #a855f740; }
+  .btn-primary:hover { box-shadow:0 6px 28px #a855f760; filter:brightness(1.1); }
+  .btn-secondary { background: linear-gradient(135deg,#0e7490,#06b6d4); color:#fff; box-shadow:0 4px 20px #06b6d440; }
+  .btn-secondary:hover { filter:brightness(1.1); }
+  .btn-danger { background: linear-gradient(135deg,#be123c,#f43f5e); color:#fff; }
+  .btn-sm { display:inline-block; width:auto; padding:10px 24px; font-size:.95rem; }
 
   /* ── Divider ── */
-  .divider {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 20px 0;
-    color: var(--muted);
-    font-size: .8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-  .divider::before, .divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
+  .divider { display:flex; align-items:center; gap:12px; margin:20px 0; color:var(--muted); font-size:.8rem; font-weight:700; text-transform:uppercase; }
+  .divider::before,.divider::after { content:''; flex:1; height:1px; background:var(--border); }
 
   /* ── Room badge ── */
-  .room-badge {
-    text-align: center;
-    background: var(--surface);
-    border: 1.5px dashed var(--border);
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 24px;
-  }
-  .room-badge small { color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; }
-  .room-badge .room-id {
-    font-family: 'Lilita One', cursive;
-    font-size: 2rem;
-    letter-spacing: .2em;
-    color: var(--yellow);
-  }
+  .room-badge { text-align:center; background:var(--surface); border:1.5px dashed var(--border); border-radius:12px; padding:14px; margin-bottom:24px; }
+  .room-badge small { color:var(--muted); font-size:.75rem; text-transform:uppercase; letter-spacing:.1em; }
+  .room-badge .room-id { font-family:'Lilita One',cursive; font-size:2rem; letter-spacing:.2em; color:var(--yellow); }
 
   /* ── Wait screen ── */
-  .wait-msg {
-    text-align: center;
-    padding: 16px 0;
-    color: var(--muted);
-    font-size: 1rem;
-  }
-  .dot-loader span {
-    display: inline-block;
-    width: 8px; height: 8px;
-    background: var(--scissors);
-    border-radius: 50%;
-    margin: 0 3px;
-    animation: bounce .9s ease-in-out infinite;
-  }
+  .wait-msg { text-align:center; padding:16px 0; color:var(--muted); font-size:1rem; }
+  .dot-loader span { display:inline-block; width:8px; height:8px; background:var(--scissors); border-radius:50%; margin:0 3px; animation:bounce .9s ease-in-out infinite; }
   .dot-loader span:nth-child(2){animation-delay:.15s}
   .dot-loader span:nth-child(3){animation-delay:.3s}
   @keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
 
-  /* ── Game screen ── */
-  .scoreboard {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--surface);
-    border-radius: 12px;
-    padding: 12px 16px;
-    margin-bottom: 20px;
-  }
-  .score-player { text-align: center; }
-  .score-player .pname { font-size: .8rem; color: var(--muted); font-weight: 700; text-transform: uppercase; }
-  .score-player .pscore {
-    font-family: 'Lilita One', cursive;
-    font-size: 2rem;
-    line-height: 1;
-  }
-  .score-vs { color: var(--muted); font-weight: 800; font-size: .9rem; }
-  .round-label {
-    text-align: center;
-    color: var(--muted);
-    font-size: .8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    margin-bottom: 18px;
-  }
+  /* ── Scoreboard ── */
+  .scoreboard { display:flex; justify-content:space-between; align-items:center; background:var(--surface); border-radius:12px; padding:12px 16px; margin-bottom:20px; }
+  .score-player { text-align:center; }
+  .score-player .pname { font-size:.8rem; color:var(--muted); font-weight:700; text-transform:uppercase; }
+  .score-player .pscore { font-family:'Lilita One',cursive; font-size:2rem; line-height:1; }
+  .score-vs { color:var(--muted); font-weight:800; font-size:.9rem; }
+  .round-label { text-align:center; color:var(--muted); font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; margin-bottom:18px; }
 
-  /* ── Choices ── */
-  .choices {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 20px;
-  }
+  /* ── Choice buttons ── */
+  .choices { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px; }
   .choice-btn {
-    aspect-ratio: 1;
-    background: var(--surface);
-    border: 2px solid var(--border);
-    border-radius: 16px;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    transition: transform .15s, border-color .2s, box-shadow .2s, background .2s;
+    aspect-ratio:1; background:var(--surface); border:2px solid var(--border); border-radius:16px;
+    cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+    transition: transform .15s, border-color .2s, box-shadow .2s, background .2s, opacity .3s;
   }
-  .choice-btn:hover:not(:disabled) { transform: translateY(-4px) scale(1.04); }
-  .choice-btn .icon { font-size: 2.4rem; }
-  .choice-btn .label { font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .choice-btn:hover:not(:disabled) { transform:translateY(-4px) scale(1.04); }
+  .choice-btn .icon { font-size:2.4rem; }
+  .choice-btn .label { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
 
-  .choice-btn[data-val=rock]    { border-color: #f9731640; }
-  .choice-btn[data-val=rock]:hover    { border-color: var(--rock); box-shadow: 0 0 20px #f9731640; background: #f9731610; }
-  .choice-btn[data-val=paper]   { border-color: #06b6d440; }
-  .choice-btn[data-val=paper]:hover   { border-color: var(--paper); box-shadow: 0 0 20px #06b6d440; background: #06b6d410; }
-  .choice-btn[data-val=scissors]{ border-color: #a855f740; }
-  .choice-btn[data-val=scissors]:hover{ border-color: var(--scissors); box-shadow: 0 0 20px #a855f740; background: #a855f710; }
+  .choice-btn[data-val=rock]    { border-color:#f9731640; }
+  .choice-btn[data-val=rock]:hover    { border-color:var(--rock);    box-shadow:0 0 20px #f9731640; background:#f9731610; }
+  .choice-btn[data-val=paper]   { border-color:#06b6d440; }
+  .choice-btn[data-val=paper]:hover   { border-color:var(--paper);   box-shadow:0 0 20px #06b6d440; background:#06b6d410; }
+  .choice-btn[data-val=scissors]{ border-color:#a855f740; }
+  .choice-btn[data-val=scissors]:hover{ border-color:var(--scissors);box-shadow:0 0 20px #a855f740; background:#a855f710; }
 
-  .choice-btn.selected { opacity: .5; cursor: default; }
-  .choice-btn:disabled { cursor: not-allowed; }
-  .choice-btn.mine {
-    opacity: 1 !important;
-    transform: translateY(-4px) scale(1.04);
+  .choice-btn.selected { opacity:.5; cursor:default; }
+  .choice-btn:disabled { cursor:not-allowed; }
+  .choice-btn.mine { opacity:1!important; transform:translateY(-4px) scale(1.04); }
+  .choice-btn[data-val=rock].mine    { border-color:var(--rock);    box-shadow:0 0 24px #f9731660; background:#f9731618; }
+  .choice-btn[data-val=paper].mine   { border-color:var(--paper);   box-shadow:0 0 24px #06b6d460; background:#06b6d418; }
+  .choice-btn[data-val=scissors].mine{ border-color:var(--scissors);box-shadow:0 0 24px #a855f760; background:#a855f718; }
+
+  /* ── Shake animation for timeout ── */
+  @keyframes shake {
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-8px)}
+    40%{transform:translateX(8px)}
+    60%{transform:translateX(-6px)}
+    80%{transform:translateX(6px)}
   }
-  .choice-btn[data-val=rock].mine    { border-color: var(--rock);    box-shadow: 0 0 24px #f9731660; background: #f9731618; }
-  .choice-btn[data-val=paper].mine   { border-color: var(--paper);   box-shadow: 0 0 24px #06b6d460; background: #06b6d418; }
-  .choice-btn[data-val=scissors].mine{ border-color: var(--scissors);box-shadow: 0 0 24px #a855f760; background: #a855f718; }
+  .shake { animation: shake .5s ease; }
+
+  /* ── Timer bar ── */
+  .timer-wrap {
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .timer-bar-bg {
+    width: 100%; height: 8px; background: var(--surface);
+    border-radius: 99px; overflow: hidden;
+  }
+  .timer-bar-fill {
+    height: 100%; width: 100%;
+    background: linear-gradient(90deg, var(--green), var(--yellow));
+    border-radius: 99px;
+    transition: width 1s linear, background-color .5s;
+    transform-origin: left;
+  }
+  .timer-label {
+    text-align: center; font-family: 'Lilita One', cursive;
+    font-size: .85rem; color: var(--muted); margin-top: 5px;
+    letter-spacing: .05em;
+  }
+  .timer-bar-fill.suspense { background: linear-gradient(90deg, var(--yellow), #fb923c); }
+  .timer-bar-fill.urgent   { background: linear-gradient(90deg, var(--red), #ff4500); }
+  .timer-label.suspense { color: var(--yellow); font-weight: 800; }
+  .timer-label.urgent   { color: var(--red); }
+
+  @keyframes timerPulse {
+    0%   { transform: scaleY(1);    box-shadow: none; }
+    30%  { transform: scaleY(1.18); box-shadow: 0 0 14px #fbbf2460; }
+    60%  { transform: scaleY(.95);  box-shadow: 0 0 6px  #fbbf2430; }
+    100% { transform: scaleY(1);    box-shadow: none; }
+  }
+  .timer-pulse { animation: timerPulse .35s ease; transform-origin: center; }
 
   /* ── Status hint ── */
-  .status-hint {
-    text-align: center;
-    font-size: .9rem;
-    color: var(--muted);
-    min-height: 24px;
-    transition: color .3s;
+  .status-hint { text-align:center; font-size:.9rem; color:var(--muted); min-height:24px; transition:color .3s; }
+  .status-hint.waiting-opp { color:var(--yellow); }
+  .status-hint.timed-out   { color:var(--red); }
+
+  /* ══════════════════════════════════════════════════
+     COUNTDOWN OVERLAY (3-2-1 fullscreen)
+  ══════════════════════════════════════════════════ */
+  #countdown-overlay {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 300;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .25s;
   }
-  .status-hint.waiting-opp { color: var(--yellow); }
+  #countdown-overlay.visible { opacity: 1; pointer-events: auto; }
+
+  /* Dark bg behind the number */
+  #countdown-overlay::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, #0f0e17cc 0%, #0f0e17f5 100%);
+    backdrop-filter: blur(6px);
+  }
+
+  #countdown-number {
+    position: relative;
+    font-family: 'Lilita One', cursive;
+    font-size: 14rem;
+    line-height: 1;
+    color: #fff;
+    text-shadow:
+      0 0 60px rgba(168,85,247,.8),
+      0 0 120px rgba(168,85,247,.4);
+    user-select: none;
+    /* start hidden, animation replaces */
+  }
+
+  /* Each number pops in, holds, then zooms out */
+  @keyframes cdPop {
+    0%   { transform: scale(0.2) rotate(-8deg); opacity: 0; }
+    20%  { transform: scale(1.15) rotate(2deg);  opacity: 1; }
+    40%  { transform: scale(1)    rotate(0deg);  opacity: 1; }
+    80%  { transform: scale(1)    rotate(0deg);  opacity: 1; }
+    100% { transform: scale(3)    rotate(0deg);  opacity: 0; }
+  }
+  .cd-anim {
+    animation: cdPop .95s cubic-bezier(.34,1.56,.64,1) forwards;
+  }
+
+  /* Color per digit */
+  .cd-3 { color: var(--green); text-shadow: 0 0 60px #22d3a580, 0 0 120px #22d3a540; }
+  .cd-2 { color: var(--yellow); text-shadow: 0 0 60px #fbbf2480, 0 0 120px #fbbf2440; }
+  .cd-1 { color: var(--red); text-shadow: 0 0 60px #f43f5e80, 0 0 120px #f43f5e40; }
+  .cd-go {
+    font-size: 8rem;
+    color: var(--scissors);
+    text-shadow: 0 0 60px #a855f780, 0 0 120px #a855f740;
+  }
+
+  /* Ripple ring on each number */
+  #countdown-ring {
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    opacity: 0;
+  }
+  @keyframes ringPulse {
+    0%   { transform: scale(.5); opacity: .7; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+  .ring-anim { animation: ringPulse .95s ease-out forwards; }
+
+  /* ══════════════════════════════════════════════════
+     GAME START intro (player names fly in)
+  ══════════════════════════════════════════════════ */
+  #start-overlay {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 20px;
+    z-index: 200;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .3s;
+  }
+  #start-overlay.visible { opacity: 1; pointer-events: auto; }
+  #start-overlay::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: #0f0e17f0;
+    backdrop-filter: blur(8px);
+  }
+  .start-vs-row {
+    position: relative;
+    display: flex; align-items: center; gap: 24px;
+  }
+  .start-name {
+    font-family: 'Lilita One', cursive;
+    font-size: 2.2rem; color: var(--text);
+    opacity: 0;
+    position: relative;
+  }
+  .start-name.p1 {
+    animation: slideRight .5s .2s cubic-bezier(.34,1.56,.64,1) forwards;
+    color: var(--green);
+    text-shadow: 0 0 30px #22d3a560;
+  }
+  .start-name.p2 {
+    animation: slideLeft .5s .2s cubic-bezier(.34,1.56,.64,1) forwards;
+    color: var(--red);
+    text-shadow: 0 0 30px #f43f5e60;
+  }
+  @keyframes slideRight {
+    from { transform: translateX(-80px); opacity: 0; }
+    to   { transform: translateX(0);     opacity: 1; }
+  }
+  @keyframes slideLeft {
+    from { transform: translateX(80px);  opacity: 0; }
+    to   { transform: translateX(0);     opacity: 1; }
+  }
+  .start-vs {
+    font-family: 'Lilita One', cursive; font-size: 1.6rem; color: var(--muted);
+    opacity: 0; position: relative;
+    animation: fadeIn .4s .5s forwards;
+  }
+  .start-round-label {
+    font-family: 'Lilita One', cursive; font-size: 1.1rem;
+    color: var(--yellow); letter-spacing: .1em;
+    opacity: 0; position: relative;
+    animation: fadeIn .4s .7s forwards;
+  }
+  @keyframes fadeIn { from{opacity:0;transform:scale(.8)} to{opacity:1;transform:scale(1)} }
 
   /* ── Result overlay ── */
   .result-overlay {
-    position: fixed;
-    inset: 0;
-    background: #0f0e17e0;
-    backdrop-filter: blur(8px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .3s;
+    position: fixed; inset: 0; background: #0f0e17e0; backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100; opacity: 0; pointer-events: none; transition: opacity .3s;
   }
-  .result-overlay.show { opacity: 1; pointer-events: auto; }
-
+  .result-overlay.show { opacity:1; pointer-events:auto; }
   .result-box {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 32px 28px;
-    width: 90%;
-    max-width: 360px;
-    text-align: center;
-    transform: scale(.92);
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 24px; padding: 32px 28px; width: 90%; max-width: 360px;
+    text-align: center; transform: scale(.92);
     transition: transform .3s cubic-bezier(.34,1.56,.64,1);
   }
   .result-overlay.show .result-box { transform: scale(1); }
 
   .result-emoji { font-size: 3rem; }
-  .result-title {
-    font-family: 'Lilita One', cursive;
-    font-size: 2rem;
-    margin: 8px 0 4px;
-  }
-  .result-title.win  { color: var(--green); text-shadow: var(--win-glow); }
-  .result-title.lose { color: var(--red);   text-shadow: var(--lose-glow); }
-  .result-title.draw { color: var(--yellow); }
+  .result-title { font-family:'Lilita One',cursive; font-size:2rem; margin:8px 0 4px; }
+  .result-title.win  { color:var(--green);  text-shadow:var(--win-glow); }
+  .result-title.lose { color:var(--red);    text-shadow:var(--lose-glow); }
+  .result-title.draw { color:var(--yellow); }
 
-  .result-choices {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 16px;
-    margin: 16px 0;
-    font-size: 1rem;
-    font-weight: 700;
-  }
-  .result-choices .vs { color: var(--muted); font-size: .8rem; }
-  .result-choices .pill {
-    background: var(--surface);
-    border-radius: 10px;
-    padding: 8px 14px;
-    font-size: .9rem;
+  .timeout-badge {
+    display: inline-block; background: #f43f5e20; border: 1px solid #f43f5e60;
+    color: var(--red); font-size: .75rem; font-weight: 700; padding: 3px 10px;
+    border-radius: 20px; margin-bottom: 8px; letter-spacing: .05em;
   }
 
-  .result-score {
-    color: var(--muted);
-    font-size: .9rem;
-    margin-bottom: 20px;
-  }
-  .result-score strong { color: var(--text); }
-
-  .result-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .result-choices { display:flex; justify-content:center; align-items:center; gap:16px; margin:16px 0; font-size:1rem; font-weight:700; }
+  .result-choices .vs { color:var(--muted); font-size:.8rem; }
+  .result-choices .pill { background:var(--surface); border-radius:10px; padding:8px 14px; font-size:.9rem; }
+  .result-score { color:var(--muted); font-size:.9rem; margin-bottom:20px; }
+  .result-score strong { color:var(--text); }
+  .result-actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
 
   /* ── Notification ── */
   .notif {
-    position: fixed;
-    top: 20px;
-    left: 50%;
+    position: fixed; top: 20px; left: 50%;
     transform: translateX(-50%) translateY(-80px);
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 20px;
-    font-weight: 700;
-    font-size: .9rem;
-    z-index: 200;
-    transition: transform .4s cubic-bezier(.34,1.56,.64,1), opacity .4s;
-    opacity: 0;
-    white-space: nowrap;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 20px; font-weight: 700; font-size: .9rem;
+    z-index: 400; transition: transform .4s cubic-bezier(.34,1.56,.64,1), opacity .4s;
+    opacity: 0; white-space: nowrap;
   }
   .notif.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-  .notif.info  { border-color: var(--paper); color: var(--paper); }
-  .notif.success { border-color: var(--green); color: var(--green); }
-  .notif.error { border-color: var(--red); color: var(--red); }
+  .notif.info    { border-color:var(--paper);    color:var(--paper); }
+  .notif.success { border-color:var(--green);    color:var(--green); }
+  .notif.error   { border-color:var(--red);      color:var(--red); }
+  .notif.warning { border-color:var(--yellow);   color:var(--yellow); }
 
-  /* ── Error message ── */
-  .err-msg { color: var(--red); font-size: .85rem; text-align: center; margin-bottom: 10px; min-height: 20px; }
+  /* ── Error msg ── */
+  .err-msg { color:var(--red); font-size:.85rem; text-align:center; margin-bottom:10px; min-height:20px; }
+
+  /* ── Opponent chose pulse ── */
+  @keyframes pulseGreen {
+    0%,100% { box-shadow: 0 0 0 0 #22d3a540; }
+    50%      { box-shadow: 0 0 0 12px #22d3a500; }
+  }
+  .opp-chose-pulse { animation: pulseGreen .6s ease; }
 </style>
 </head>
 <body>
 
+<!-- ═══════════════════════ OVERLAYS ═══════════════════════ -->
+
+<!-- Game start intro -->
+<div id="start-overlay">
+  <div class="start-round-label" id="start-round-label">VÒNG 1</div>
+  <div class="start-vs-row">
+    <div class="start-name p1" id="start-p1">Player 1</div>
+    <div class="start-vs">VS</div>
+    <div class="start-name p2" id="start-p2">Player 2</div>
+  </div>
+</div>
+
+<!-- 3-2-1 countdown overlay -->
+<div id="countdown-overlay">
+  <div id="countdown-ring"></div>
+  <div id="countdown-number"></div>
+</div>
+
+<!-- ════════════════════════ MAIN ════════════════════════ -->
 <div class="wrap">
-  <!-- Logo -->
   <div class="logo">
     <div class="emoji-row">✊ ✋ ✌️</div>
     <h1>Kéo Búa Bao</h1>
     <p>Real-time multiplayer · Socket.IO</p>
   </div>
 
-  <!-- ── SCREEN: Lobby ── -->
+  <!-- LOBBY -->
   <div class="card screen active" id="screen-lobby">
     <label for="inp-name">Tên người chơi</label>
     <input id="inp-name" type="text" placeholder="Nhập tên của bạn…" maxlength="20" autocomplete="off">
-
     <button class="btn btn-primary" onclick="createRoom()">🏠 Tạo phòng mới</button>
-
     <div class="divider">hoặc</div>
-
     <label for="inp-room">Mã phòng</label>
     <input id="inp-room" type="text" placeholder="VD: AB12" maxlength="8" autocomplete="off"
            style="text-transform:uppercase;letter-spacing:.2em;font-size:1.3rem;margin-bottom:0">
     <div class="err-msg" id="err-msg"></div>
-
     <button class="btn btn-secondary" onclick="joinRoom()">🚪 Vào phòng</button>
   </div>
 
-  <!-- ── SCREEN: Waiting ── -->
+  <!-- WAITING -->
   <div class="card screen" id="screen-wait">
     <div class="room-badge">
       <small>Mã phòng của bạn</small>
@@ -431,7 +449,7 @@
     <button class="btn btn-danger" style="margin-top:24px" onclick="leaveRoom()">↩ Thoát phòng</button>
   </div>
 
-  <!-- ── SCREEN: Game ── -->
+  <!-- GAME -->
   <div class="card screen" id="screen-game">
     <div class="scoreboard">
       <div class="score-player">
@@ -446,6 +464,14 @@
     </div>
 
     <div class="round-label" id="round-label">Vòng 1</div>
+
+    <!-- Timer -->
+    <div class="timer-wrap" id="timer-wrap" style="display:none">
+      <div class="timer-bar-bg">
+        <div class="timer-bar-fill" id="timer-bar"></div>
+      </div>
+      <div class="timer-label" id="timer-label">⏱ 10s</div>
+    </div>
 
     <div class="choices">
       <button class="choice-btn" data-val="rock"     onclick="choose('rock')">
@@ -463,10 +489,11 @@
   </div>
 </div>
 
-<!-- ── Result overlay ── -->
+<!-- Result overlay -->
 <div class="result-overlay" id="result-overlay">
   <div class="result-box">
     <div class="result-emoji" id="res-emoji">✊</div>
+    <div id="res-timeout-badge" class="timeout-badge" style="display:none">⏰ Hết giờ — tự động thua!</div>
     <div class="result-title" id="res-title">Hòa!</div>
     <div class="result-choices">
       <div class="pill" id="res-me">—</div>
@@ -482,31 +509,156 @@
   </div>
 </div>
 
-<!-- Notification -->
 <div class="notif" id="notif"></div>
 
+<!-- ════════════════════ AUDIO ENGINE ════════════════════ -->
 <script>
-// ─── Socket ───────────────────────────────────────────────────────────────────
+// ─── Web Audio Context ────────────────────────────────────────────────────────
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let ctx = null;
+
+function getCtx() {
+  if (!ctx) ctx = new AudioCtx();
+  if (ctx.state === 'suspended') ctx.resume();
+  return ctx;
+}
+
+// Unlock audio on first interaction
+document.addEventListener('click', () => getCtx(), { once: true });
+document.addEventListener('keydown', () => getCtx(), { once: true });
+
+function playTone({ freq=440, type='sine', duration=0.15, gain=0.3, decay=0.1, delay=0 } = {}) {
+  try {
+    const c = getCtx();
+    const osc = c.createOscillator();
+    const gn  = c.createGain();
+    osc.connect(gn); gn.connect(c.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, c.currentTime + delay);
+    gn.gain.setValueAtTime(gain, c.currentTime + delay);
+    gn.gain.exponentialRampToValueAtTime(0.001, c.currentTime + delay + duration + decay);
+    osc.start(c.currentTime + delay);
+    osc.stop(c.currentTime + delay + duration + decay + 0.05);
+  } catch(e) {}
+}
+
+function playNoise(duration=0.1, gain=0.15) {
+  try {
+    const c = getCtx();
+    const bufSize = c.sampleRate * duration;
+    const buf = c.createBuffer(1, bufSize, c.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i=0;i<bufSize;i++) data[i] = Math.random()*2-1;
+    const src = c.createBufferSource();
+    const gn  = c.createGain();
+    const flt = c.createBiquadFilter();
+    flt.type = 'bandpass'; flt.frequency.value = 800;
+    src.buffer = buf;
+    src.connect(flt); flt.connect(gn); gn.connect(c.destination);
+    gn.gain.setValueAtTime(gain, c.currentTime);
+    gn.gain.exponentialRampToValueAtTime(0.001, c.currentTime + duration);
+    src.start(); src.stop(c.currentTime + duration + 0.05);
+  } catch(e) {}
+}
+
+// Sound presets
+const SFX = {
+  // Countdown numbers 3, 2, 1 — each with slight variation
+  countdown3: () => playTone({ freq:523, type:'triangle', duration:.15, gain:.35, decay:.15 }),
+  countdown2: () => playTone({ freq:659, type:'triangle', duration:.15, gain:.35, decay:.15 }),
+  countdown1: () => playTone({ freq:784, type:'triangle', duration:.15, gain:.4,  decay:.2  }),
+
+  // "GO!" — punchy double tone
+  go: () => {
+    playTone({ freq:1047, type:'square', duration:.08, gain:.25, decay:.05, delay:0   });
+    playTone({ freq:1319, type:'square', duration:.12, gain:.3,  decay:.1,  delay:.09 });
+  },
+
+  // Tick per second on the timer bar (6s+)
+  tick: () => playTone({ freq:300, type:'sine', duration:.04, gain:.12, decay:.03 }),
+
+  // Suspense heartbeat (5s → 1s): double thump, pitch rises each second
+  suspense: (remaining) => {
+    // remaining: 5,4,3,2,1 → pitch goes from 220 up to 400
+    const base = 180 + (6 - remaining) * 44; // 224 → 400
+    // first thump
+    playTone({ freq: base,      type:'sine', duration:.07, gain:.35, decay:.05, delay:0    });
+    playTone({ freq: base*.5,   type:'sine', duration:.09, gain:.2,  decay:.06, delay:.01  });
+    // second thump (faster, higher)
+    playTone({ freq: base*1.15, type:'sine', duration:.06, gain:.28, decay:.04, delay:.14  });
+    playTone({ freq: base*.55,  type:'sine', duration:.08, gain:.15, decay:.05, delay:.15  });
+    // tiny noise snap for impact
+    playNoise(.03, .08);
+  },
+
+  // Player makes a choice
+  choose: () => {
+    playNoise(.05, .12);
+    playTone({ freq:660, type:'sine', duration:.08, gain:.2, decay:.1, delay:.04 });
+  },
+
+  // Opponent chose notification
+  oppChose: () => playTone({ freq:880, type:'sine', duration:.07, gain:.15, decay:.08 }),
+
+  // Timeout — sad descending
+  timeout: () => {
+    playTone({ freq:400, type:'sawtooth', duration:.15, gain:.25, decay:.1, delay:0   });
+    playTone({ freq:300, type:'sawtooth', duration:.2,  gain:.2,  decay:.15, delay:.2 });
+    playTone({ freq:200, type:'sawtooth', duration:.3,  gain:.15, decay:.2,  delay:.45 });
+  },
+
+  // Win — triumphant
+  win: () => {
+    [523,659,784,1047].forEach((f,i) =>
+      playTone({ freq:f, type:'square', duration:.12, gain:.2, decay:.1, delay:i*.1 }));
+  },
+
+  // Lose — descending
+  lose: () => {
+    [400,320,260,200].forEach((f,i) =>
+      playTone({ freq:f, type:'sawtooth', duration:.18, gain:.2, decay:.1, delay:i*.12 }));
+  },
+
+  // Draw — neutral
+  draw: () => {
+    playTone({ freq:523, type:'sine', duration:.2, gain:.2, decay:.15, delay:0   });
+    playTone({ freq:523, type:'sine', duration:.2, gain:.2, decay:.15, delay:.25 });
+  },
+
+  // Game start fanfare
+  fanfare: () => {
+    [[523,.0],[659,.15],[784,.3],[1047,.45],[784,.6],[1047,.75]].forEach(([f,d]) =>
+      playTone({ freq:f, type:'square', duration:.12, gain:.18, decay:.08, delay:d }));
+  },
+
+  // Button click
+  click: () => playTone({ freq:800, type:'sine', duration:.05, gain:.1, decay:.05 }),
+
+  // Join / connect
+  join: () => {
+    playTone({ freq:440, type:'sine', duration:.1, gain:.2, decay:.1, delay:0   });
+    playTone({ freq:660, type:'sine', duration:.1, gain:.2, decay:.1, delay:.12 });
+  },
+};
+</script>
+
+<!-- ════════════════════ GAME LOGIC ════════════════════ -->
+<script>
 const socket = io();
 
-let myId = null;
-let myName = '';
-let myRoomId = '';
-let oppId = null;
-let oppName = '';
-let scores = {};
-let currentRound = 1;
-let hasChosen = false;
+let myId = null, myName='', myRoomId='', oppId=null, oppName='';
+let scores = {}, currentRound=1, hasChosen=false;
+let timerTotal=10, timerInterval=null;
 
 socket.on('connect', () => { myId = socket.id; });
 
-// ─── Screen helpers ───────────────────────────────────────────────────────────
+// ─── Screens ──────────────────────────────────────────────────────────────────
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-function notify(msg, type = 'info', duration = 3000) {
+function notify(msg, type='info', duration=3000) {
   const el = document.getElementById('notif');
   el.textContent = msg;
   el.className = `notif ${type} show`;
@@ -514,12 +666,11 @@ function notify(msg, type = 'info', duration = 3000) {
   el._t = setTimeout(() => el.classList.remove('show'), duration);
 }
 
-// ─── Lobby actions ────────────────────────────────────────────────────────────
-function getName() {
-  return document.getElementById('inp-name').value.trim();
-}
+// ─── Lobby ────────────────────────────────────────────────────────────────────
+function getName() { return document.getElementById('inp-name').value.trim(); }
 
 function createRoom() {
+  SFX.click();
   const name = getName();
   if (!name) { document.getElementById('inp-name').focus(); return; }
   myName = name;
@@ -527,6 +678,7 @@ function createRoom() {
 }
 
 function joinRoom() {
+  SFX.click();
   const name = getName();
   const roomId = document.getElementById('inp-room').value.trim().toUpperCase();
   document.getElementById('err-msg').textContent = '';
@@ -536,140 +688,287 @@ function joinRoom() {
   socket.emit('joinRoom', { name, roomId });
 }
 
-// ─── Room events ─────────────────────────────────────────────────────────────
 socket.on('joinedRoom', ({ roomId, name }) => {
   myRoomId = roomId;
-  myName = name;
+  myName   = name;
   document.getElementById('display-room-id').textContent = roomId;
+  SFX.join();
 });
-
-socket.on('waiting', () => {
-  showScreen('screen-wait');
-});
-
+socket.on('waiting', () => showScreen('screen-wait'));
 socket.on('error', (msg) => {
   document.getElementById('err-msg').textContent = msg;
   notify(msg, 'error');
 });
 
-socket.on('gameStart', ({ players, round, isRematch }) => {
-  // Determine opponent
-  const [p1name, p2name] = players;
-  if (p1name === myName) {
-    oppName = p2name;
-  } else {
-    oppName = p1name;
+// ─── Game Start Intro Overlay ─────────────────────────────────────────────────
+function showStartOverlay(p1Name, p2Name, roundNum, callback) {
+  const overlay = document.getElementById('start-overlay');
+  document.getElementById('start-p1').textContent = p1Name;
+  document.getElementById('start-p2').textContent = p2Name;
+  document.getElementById('start-round-label').textContent =
+    roundNum > 1 ? `VÒNG ${roundNum}` : 'TRẬN ĐẤU BẮT ĐẦU!';
+
+  // Reset animations by cloning
+  const p1El = document.getElementById('start-p1');
+  const p2El = document.getElementById('start-p2');
+  p1El.style.animation = 'none'; p2El.style.animation = 'none';
+  void p1El.offsetWidth;
+  p1El.style.animation = ''; p2El.style.animation = '';
+
+  overlay.classList.add('visible');
+  SFX.fanfare();
+
+  setTimeout(() => {
+    overlay.classList.remove('visible');
+    if (callback) callback();
+  }, 3000);
+}
+
+// ─── 3-2-1 Countdown ─────────────────────────────────────────────────────────
+const CD_STEP = 950; // must match cdPop animation duration in CSS
+
+function runCountdown(callback) {
+  const overlay = document.getElementById('countdown-overlay');
+  const numEl   = document.getElementById('countdown-number');
+  const ringEl  = document.getElementById('countdown-ring');
+  const sequence = [
+    { text:'3',   cls:'cd-3',  sfx: SFX.countdown3 },
+    { text:'2',   cls:'cd-2',  sfx: SFX.countdown2 },
+    { text:'1',   cls:'cd-1',  sfx: SFX.countdown1 },
+    { text:'GO!', cls:'cd-go', sfx: SFX.go          },
+  ];
+
+  // Kill any previous countdown still running
+  if (window._cdTimeout) { clearTimeout(window._cdTimeout); window._cdTimeout = null; }
+
+  overlay.classList.add('visible');
+
+  function showStep(idx) {
+    if (idx >= sequence.length) {
+      // All done — hide overlay and let game begin
+      overlay.classList.remove('visible');
+      numEl.className   = '';
+      numEl.textContent = '';
+      ringEl.className  = '';
+      if (callback) callback();
+      return;
+    }
+
+    const { text, cls, sfx } = sequence[idx];
+
+    // Force-reset element so re-applying the same class re-triggers animation
+    numEl.className   = '';
+    numEl.textContent = '';
+    ringEl.className  = '';
+    void numEl.offsetWidth;   // reflow flush — critical for re-triggering CSS animation
+
+    numEl.textContent = text;
+    numEl.className   = `cd-anim ${cls}`;
+
+    // Sync ring color to the number color then trigger its animation
+    const color = { 'cd-3': '#22d3a5', 'cd-2': '#fbbf24', 'cd-1': '#f43f5e', 'cd-go': '#a855f7' }[cls];
+    ringEl.style.borderColor = color;
+    void ringEl.offsetWidth;
+    ringEl.className = 'ring-anim';
+
+    sfx();
+
+    window._cdTimeout = setTimeout(() => showStep(idx + 1), CD_STEP);
   }
 
+  showStep(0);
+}
+
+// ─── Game Start ───────────────────────────────────────────────────────────────
+socket.on('gameStart', ({ players, round, isRematch }) => {
+  const [p1name, p2name] = players;
+  oppName = p1name === myName ? p2name : p1name;
   currentRound = round;
   scores = {};
   hasChosen = false;
 
-  document.getElementById('me-name').textContent = myName;
+  document.getElementById('me-name').textContent  = myName;
   document.getElementById('opp-name').textContent = oppName;
-  document.getElementById('me-score').textContent = '0';
+  document.getElementById('me-score').textContent  = '0';
   document.getElementById('opp-score').textContent = '0';
   document.getElementById('round-label').textContent = `Vòng ${round}`;
-  document.getElementById('status-hint').textContent = 'Hãy chọn một lựa chọn!';
+  document.getElementById('status-hint').textContent = '';
   document.getElementById('status-hint').className = 'status-hint';
-
   resetChoiceBtns();
   hideResult();
+  hideTimer();
   showScreen('screen-game');
 
-  if (isRematch) notify('🔄 Ván mới bắt đầu!', 'success');
-  else notify(`⚔️ ${oppName} đã vào phòng! Bắt đầu thôi!`, 'success');
+  if (isRematch) {
+    notify('🔄 Ván mới bắt đầu!', 'success');
+  } else {
+    notify(`⚔️ ${oppName} đã vào phòng!`, 'success');
+  }
+
+  // Show intro overlay (server will send roundBegin ~3.5s later)
+  showStartOverlay(myName, oppName, round);
 });
 
-socket.on('playerLeft', (name) => {
-  notify(`😢 ${name} đã rời phòng`, 'error', 4000);
-  setTimeout(() => {
-    leaveRoom(true);
-  }, 2500);
+// ─── Round Begin (server fires after intro delay) ─────────────────────────────
+socket.on('roundBegin', ({ round }) => {
+  currentRound = round;
+  hasChosen = false;
+  resetChoiceBtns();
+  hideResult();
+  document.getElementById('round-label').textContent = `Vòng ${round}`;
+  document.getElementById('status-hint').textContent = '';
+  document.getElementById('status-hint').className = 'status-hint';
+
+  // Play countdown then enable buttons
+  runCountdown(() => {
+    document.getElementById('status-hint').textContent = 'Hãy chọn một lựa chọn!';
+    setChoiceBtnsEnabled(true);
+  });
 });
+
+// ─── Timer ────────────────────────────────────────────────────────────────────
+socket.on('timerStart', ({ seconds }) => {
+  timerTotal = seconds;
+  showTimer(seconds);
+});
+
+socket.on('timerTick', ({ remaining }) => {
+  updateTimer(remaining);
+  if (remaining <= 5) SFX.suspense(remaining);
+  else SFX.tick();
+});
+
+function showTimer(seconds) {
+  const wrap = document.getElementById('timer-wrap');
+  const bar  = document.getElementById('timer-bar');
+  const lbl  = document.getElementById('timer-label');
+  wrap.style.display = 'block';
+  bar.style.transition = 'none';
+  bar.style.width = '100%';
+  bar.className = 'timer-bar-fill';
+  lbl.className = 'timer-label';
+  lbl.textContent = `⏱ ${seconds}s`;
+}
+
+function updateTimer(remaining) {
+  const bar  = document.getElementById('timer-bar');
+  const lbl  = document.getElementById('timer-label');
+  const wrap = document.getElementById('timer-wrap');
+  const pct  = (remaining / timerTotal) * 100;
+  bar.style.transition = 'width 1s linear';
+  bar.style.width = pct + '%';
+  lbl.textContent = `⏱ ${remaining}s`;
+
+  const suspense = remaining <= 5;
+  const urgent   = remaining <= 2;
+  bar.className = 'timer-bar-fill' + (urgent ? ' urgent' : suspense ? ' suspense' : '');
+  lbl.className = 'timer-label'    + (urgent ? ' urgent' : suspense ? ' suspense' : '');
+
+  // Pulse the whole timer wrap on each suspense tick
+  if (suspense) {
+    wrap.classList.remove('timer-pulse');
+    void wrap.offsetWidth;
+    wrap.classList.add('timer-pulse');
+  }
+}
+
+function hideTimer() {
+  document.getElementById('timer-wrap').style.display = 'none';
+}
 
 // ─── Gameplay ─────────────────────────────────────────────────────────────────
-const EMOJI = { rock: '✊', paper: '✋', scissors: '✌️' };
-const VI    = { rock: 'Búa', paper: 'Bao', scissors: 'Kéo' };
+const EMOJI = { rock:'✊', paper:'✋', scissors:'✌️' };
+const VI    = { rock:'Búa', paper:'Bao', scissors:'Kéo' };
 
 function choose(val) {
   if (hasChosen) return;
   hasChosen = true;
-
+  SFX.choose();
   socket.emit('choose', val);
-
-  // Visual feedback
+  setChoiceBtnsEnabled(false);
   document.querySelectorAll('.choice-btn').forEach(btn => {
-    btn.disabled = true;
     if (btn.dataset.val === val) btn.classList.add('mine');
     else btn.classList.add('selected');
   });
-
   document.getElementById('status-hint').textContent = `Bạn chọn ${EMOJI[val]} ${VI[val]} — chờ đối thủ…`;
   document.getElementById('status-hint').className = 'status-hint waiting-opp';
 }
 
 socket.on('opponentChose', () => {
+  SFX.oppChose();
   const hint = document.getElementById('status-hint');
-  if (hint.className.includes('waiting-opp')) {
+  const scoreBoard = document.querySelector('.scoreboard');
+  scoreBoard.classList.add('opp-chose-pulse');
+  scoreBoard.addEventListener('animationend', () => scoreBoard.classList.remove('opp-chose-pulse'), { once:true });
+
+  if (hasChosen) {
     hint.textContent = '✓ Cả hai đã chọn xong!';
   } else {
-    hint.textContent = `${oppName} đã chọn xong — đến lượt bạn!`;
+    hint.textContent = `${oppName} đã chọn — nhanh lên!`;
     hint.style.color = 'var(--yellow)';
   }
 });
 
+// Timed out — server will send result with timedOut flag, but we also get this early
+socket.on('timedOut', () => {
+  SFX.timeout();
+  hasChosen = true; // mark so we don't try to pick
+  setChoiceBtnsEnabled(false);
+  // Shake the choice grid
+  const grid = document.querySelector('.choices');
+  grid.classList.add('shake');
+  grid.addEventListener('animationend', () => grid.classList.remove('shake'), { once:true });
+  document.getElementById('status-hint').textContent = '⏰ Hết giờ! Bạn không kịp chọn...';
+  document.getElementById('status-hint').className = 'status-hint timed-out';
+  notify('⏰ Hết giờ — tự động thua vòng này!', 'error', 4000);
+});
+
 socket.on('roundResult', (data) => {
-  const { round, choices, results, scores: s, players } = data;
-
-  // Map ids
-  players.forEach(p => {
-    if (p.name === myName) myId = p.id;
-    else oppId = p.id;
-  });
-
+  const { round, choices, results, timedOut, scores: s, players } = data;
+  players.forEach(p => { if (p.name === myName) myId = p.id; else oppId = p.id; });
   scores = s;
   currentRound = round + 1;
 
-  const myChoice   = choices[myId];
-  const oppChoice  = choices[oppId];
-  const myResult   = results[myId];
+  const myChoice  = choices[myId];
+  const oppChoice = choices[oppId];
+  const myResult  = results[myId];
+  const myTO      = timedOut && timedOut[myId];
 
-  const meScore  = s[myId]  || 0;
-  const oppScore = s[oppId] || 0;
+  document.getElementById('me-score').textContent  = s[myId]  || 0;
+  document.getElementById('opp-score').textContent = s[oppId] || 0;
+  hideTimer();
 
-  // Update scoreboard
-  document.getElementById('me-score').textContent  = meScore;
-  document.getElementById('opp-score').textContent = oppScore;
+  // Play result sound
+  if      (myResult === 'win')  SFX.win();
+  else if (myResult === 'lose') SFX.lose();
+  else                          SFX.draw();
 
-  showResult(myResult, myChoice, oppChoice, meScore, oppScore, round);
+  setTimeout(() => {
+    showResult(myResult, myChoice, oppChoice, s[myId]||0, s[oppId]||0, round, myTO);
+  }, 300);
 });
 
 // ─── Result overlay ───────────────────────────────────────────────────────────
-function showResult(result, myChoice, oppChoice, meScore, oppScore, round) {
-  const title   = document.getElementById('res-title');
-  const emoji   = document.getElementById('res-emoji');
-  const resMe   = document.getElementById('res-me');
-  const resOpp  = document.getElementById('res-opp');
-  const resSc   = document.getElementById('res-score');
+function showResult(result, myChoice, oppChoice, meScore, oppScore, round, timedOutFlag) {
+  const title = document.getElementById('res-title');
+  const emoji = document.getElementById('res-emoji');
+  const tBadge = document.getElementById('res-timeout-badge');
 
-  resMe.textContent  = `${EMOJI[myChoice]} ${VI[myChoice]}`;
-  resOpp.textContent = `${EMOJI[oppChoice]} ${VI[oppChoice]}`;
-  resSc.innerHTML    = `<strong>${myName}</strong> ${meScore} – ${oppScore} <strong>${oppName}</strong>`;
+  document.getElementById('res-me').textContent  = `${EMOJI[myChoice]} ${VI[myChoice]}`;
+  document.getElementById('res-opp').textContent = `${EMOJI[oppChoice]} ${VI[oppChoice]}`;
+  document.getElementById('res-score').innerHTML =
+    `<strong>${myName}</strong> ${meScore} – ${oppScore} <strong>${oppName}</strong>`;
   document.getElementById('round-label').textContent = `Vòng ${round}`;
 
+  tBadge.style.display = timedOutFlag ? 'inline-block' : 'none';
+
   if (result === 'win') {
-    title.textContent = '🎉 Bạn thắng!';
-    title.className = 'result-title win';
-    emoji.textContent = '🏆';
+    title.textContent = '🎉 Bạn thắng!'; title.className = 'result-title win'; emoji.textContent = '🏆';
   } else if (result === 'lose') {
-    title.textContent = '💀 Bạn thua!';
-    title.className = 'result-title lose';
-    emoji.textContent = '😢';
+    title.textContent = timedOutFlag ? '⏰ Hết giờ — Thua!' : '💀 Bạn thua!';
+    title.className = 'result-title lose'; emoji.textContent = timedOutFlag ? '⏰' : '😢';
   } else {
-    title.textContent = '🤝 Hòa!';
-    title.className = 'result-title draw';
-    emoji.textContent = '😅';
+    title.textContent = '🤝 Hòa!'; title.className = 'result-title draw'; emoji.textContent = '😅';
   }
 
   document.getElementById('result-overlay').classList.add('show');
@@ -680,12 +979,14 @@ function hideResult() {
 }
 
 function nextRound() {
+  SFX.click();
   hideResult();
   hasChosen = false;
   resetChoiceBtns();
+  setChoiceBtnsEnabled(false); // disable until roundBegin + countdown
   document.getElementById('round-label').textContent = `Vòng ${currentRound}`;
-  document.getElementById('status-hint').textContent = 'Hãy chọn một lựa chọn!';
-  document.getElementById('status-hint').className = 'status-hint';
+  document.getElementById('status-hint').textContent = 'Đang chờ cả hai sẵn sàng…';
+  socket.emit('nextRound');
 }
 
 function resetChoiceBtns() {
@@ -695,43 +996,44 @@ function resetChoiceBtns() {
   });
 }
 
+function setChoiceBtnsEnabled(enabled) {
+  document.querySelectorAll('.choice-btn').forEach(btn => btn.disabled = !enabled);
+}
+
 // ─── Rematch ──────────────────────────────────────────────────────────────────
 function requestRematch() {
+  SFX.click();
   socket.emit('rematch');
   notify('🔄 Đã gửi yêu cầu chơi lại…', 'info');
   hideResult();
 }
-
 socket.on('rematchRequest', (name) => {
   notify(`🔄 ${name} muốn chơi lại!`, 'info', 5000);
 });
 
 // ─── Leave ────────────────────────────────────────────────────────────────────
-function leaveRoom(silent = false) {
+socket.on('playerLeft', (name) => {
+  notify(`😢 ${name} đã rời phòng`, 'error', 4000);
+  setTimeout(() => leaveRoom(true), 2500);
+});
+
+function leaveRoom(silent=false) {
+  SFX.click();
   if (!silent) notify('Đã thoát phòng', 'info');
   hideResult();
+  hideTimer();
+  clearInterval(timerInterval);
   showScreen('screen-lobby');
   document.getElementById('inp-room').value = '';
   document.getElementById('err-msg').textContent = '';
-  myRoomId = '';
-  oppId = null;
-  oppName = '';
-  scores = {};
-  hasChosen = false;
-  // Reconnect with fresh socket state
+  myRoomId=''; oppId=null; oppName=''; scores={}; hasChosen=false;
   socket.disconnect().connect();
 }
 
-// ─── Enter key shortcuts ──────────────────────────────────────────────────────
-document.getElementById('inp-name').addEventListener('keydown', e => {
-  if (e.key === 'Enter') createRoom();
-});
-document.getElementById('inp-room').addEventListener('keydown', e => {
-  if (e.key === 'Enter') joinRoom();
-});
-document.getElementById('inp-room').addEventListener('input', e => {
-  e.target.value = e.target.value.toUpperCase();
-});
+// ─── Keyboard shortcuts ────────────────────────────────────────────────────────
+document.getElementById('inp-name').addEventListener('keydown', e => { if(e.key==='Enter') createRoom(); });
+document.getElementById('inp-room').addEventListener('keydown', e => { if(e.key==='Enter') joinRoom(); });
+document.getElementById('inp-room').addEventListener('input',   e => { e.target.value = e.target.value.toUpperCase(); });
 </script>
 </body>
 </html>
