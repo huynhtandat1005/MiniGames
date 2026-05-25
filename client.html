@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kéo Búa Bao</title>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@400;600;700;800&display=swap');
+
+  :root {
+    --rock:    #f97316;
+    --paper:   #06b6d4;
+    --scissors:#a855f7;
+    --bg:      #0f0e17;
+    --surface: #1a1828;
+    --card:    #232136;
+    --border:  #2e2b45;
+    --text:    #e8e6f0;
+    --muted:   #7c78a0;
+    --green:   #22d3a5;
+    --red:     #f43f5e;
+    --yellow:  #fbbf24;
+    --win-glow:  0 0 32px #22d3a580;
+    --lose-glow: 0 0 32px #f43f5e80;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-x: hidden;
+  }
+
+  /* Animated background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.3;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 480px;
+  }
+
+  /* ── Logo ── */
+  .logo {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .logo h1 {
+    font-family: 'Lilita One', cursive;
+    font-size: 2.6rem;
+    background: linear-gradient(135deg, var(--rock), var(--scissors), var(--paper));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+  .logo p {
+    color: var(--muted);
+    font-size: .9rem;
+    margin-top: 6px;
+    letter-spacing: .05em;
+  }
+  .emoji-row { font-size: 1.8rem; margin-bottom: 8px; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+  /* ── Card ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    backdrop-filter: blur(12px);
+  }
+
+  /* ── Screens ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── Form elements ── */
+  label {
+    display: block;
+    font-size: .8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  input[type=text] {
+    width: 100%;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 12px 16px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    margin-bottom: 20px;
+  }
+  input[type=text]:focus {
+    border-color: var(--scissors);
+    box-shadow: 0 0 0 3px #a855f730;
+  }
+  input[type=text]::placeholder { color: var(--muted); font-weight: 400; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Lilita One', cursive;
+    font-size: 1.1rem;
+    letter-spacing: .04em;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s, filter .15s;
+    margin-top: 10px;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-primary {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: #fff;
+    box-shadow: 0 4px 20px #a855f740;
+  }
+  .btn-primary:hover { box-shadow: 0 6px 28px #a855f760; filter: brightness(1.1); }
+  .btn-secondary {
+    background: linear-gradient(135deg, #0e7490, #06b6d4);
+    color: #fff;
+    box-shadow: 0 4px 20px #06b6d440;
+  }
+  .btn-secondary:hover { filter: brightness(1.1); }
+  .btn-danger {
+    background: linear-gradient(135deg, #be123c, #f43f5e);
+    color: #fff;
+  }
+  .btn-sm {
+    display: inline-block;
+    width: auto;
+    padding: 10px 24px;
+    font-size: .95rem;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
+    color: var(--muted);
+    font-size: .8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── Room badge ── */
+  .room-badge {
+    text-align: center;
+    background: var(--surface);
+    border: 1.5px dashed var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 24px;
+  }
+  .room-badge small { color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; }
+  .room-badge .room-id {
+    font-family: 'Lilita One', cursive;
+    font-size: 2rem;
+    letter-spacing: .2em;
+    color: var(--yellow);
+  }
+
+  /* ── Wait screen ── */
+  .wait-msg {
+    text-align: center;
+    padding: 16px 0;
+    color: var(--muted);
+    font-size: 1rem;
+  }
+  .dot-loader span {
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--scissors);
+    border-radius: 50%;
+    margin: 0 3px;
+    animation: bounce .9s ease-in-out infinite;
+  }
+  .dot-loader span:nth-child(2){animation-delay:.15s}
+  .dot-loader span:nth-child(3){animation-delay:.3s}
+  @keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+
+  /* ── Game screen ── */
+  .scoreboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+  }
+  .score-player { text-align: center; }
+  .score-player .pname { font-size: .8rem; color: var(--muted); font-weight: 700; text-transform: uppercase; }
+  .score-player .pscore {
+    font-family: 'Lilita One', cursive;
+    font-size: 2rem;
+    line-height: 1;
+  }
+  .score-vs { color: var(--muted); font-weight: 800; font-size: .9rem; }
+  .round-label {
+    text-align: center;
+    color: var(--muted);
+    font-size: .8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    margin-bottom: 18px;
+  }
+
+  /* ── Choices ── */
+  .choices {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .choice-btn {
+    aspect-ratio: 1;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: transform .15s, border-color .2s, box-shadow .2s, background .2s;
+  }
+  .choice-btn:hover:not(:disabled) { transform: translateY(-4px) scale(1.04); }
+  .choice-btn .icon { font-size: 2.4rem; }
+  .choice-btn .label { font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+
+  .choice-btn[data-val=rock]    { border-color: #f9731640; }
+  .choice-btn[data-val=rock]:hover    { border-color: var(--rock); box-shadow: 0 0 20px #f9731640; background: #f9731610; }
+  .choice-btn[data-val=paper]   { border-color: #06b6d440; }
+  .choice-btn[data-val=paper]:hover   { border-color: var(--paper); box-shadow: 0 0 20px #06b6d440; background: #06b6d410; }
+  .choice-btn[data-val=scissors]{ border-color: #a855f740; }
+  .choice-btn[data-val=scissors]:hover{ border-color: var(--scissors); box-shadow: 0 0 20px #a855f740; background: #a855f710; }
+
+  .choice-btn.selected { opacity: .5; cursor: default; }
+  .choice-btn:disabled { cursor: not-allowed; }
+  .choice-btn.mine {
+    opacity: 1 !important;
+    transform: translateY(-4px) scale(1.04);
+  }
+  .choice-btn[data-val=rock].mine    { border-color: var(--rock);    box-shadow: 0 0 24px #f9731660; background: #f9731618; }
+  .choice-btn[data-val=paper].mine   { border-color: var(--paper);   box-shadow: 0 0 24px #06b6d460; background: #06b6d418; }
+  .choice-btn[data-val=scissors].mine{ border-color: var(--scissors);box-shadow: 0 0 24px #a855f760; background: #a855f718; }
+
+  /* ── Status hint ── */
+  .status-hint {
+    text-align: center;
+    font-size: .9rem;
+    color: var(--muted);
+    min-height: 24px;
+    transition: color .3s;
+  }
+  .status-hint.waiting-opp { color: var(--yellow); }
+
+  /* ── Result overlay ── */
+  .result-overlay {
+    position: fixed;
+    inset: 0;
+    background: #0f0e17e0;
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s;
+  }
+  .result-overlay.show { opacity: 1; pointer-events: auto; }
+
+  .result-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 32px 28px;
+    width: 90%;
+    max-width: 360px;
+    text-align: center;
+    transform: scale(.92);
+    transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+  }
+  .result-overlay.show .result-box { transform: scale(1); }
+
+  .result-emoji { font-size: 3rem; }
+  .result-title {
+    font-family: 'Lilita One', cursive;
+    font-size: 2rem;
+    margin: 8px 0 4px;
+  }
+  .result-title.win  { color: var(--green); text-shadow: var(--win-glow); }
+  .result-title.lose { color: var(--red);   text-shadow: var(--lose-glow); }
+  .result-title.draw { color: var(--yellow); }
+
+  .result-choices {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin: 16px 0;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+  .result-choices .vs { color: var(--muted); font-size: .8rem; }
+  .result-choices .pill {
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: .9rem;
+  }
+
+  .result-score {
+    color: var(--muted);
+    font-size: .9rem;
+    margin-bottom: 20px;
+  }
+  .result-score strong { color: var(--text); }
+
+  .result-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+  /* ── Notification ── */
+  .notif {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-80px);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-weight: 700;
+    font-size: .9rem;
+    z-index: 200;
+    transition: transform .4s cubic-bezier(.34,1.56,.64,1), opacity .4s;
+    opacity: 0;
+    white-space: nowrap;
+  }
+  .notif.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .notif.info  { border-color: var(--paper); color: var(--paper); }
+  .notif.success { border-color: var(--green); color: var(--green); }
+  .notif.error { border-color: var(--red); color: var(--red); }
+
+  /* ── Error message ── */
+  .err-msg { color: var(--red); font-size: .85rem; text-align: center; margin-bottom: 10px; min-height: 20px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <!-- Logo -->
+  <div class="logo">
+    <div class="emoji-row">✊ ✋ ✌️</div>
+    <h1>Kéo Búa Bao</h1>
+    <p>Real-time multiplayer · Socket.IO</p>
+  </div>
+
+  <!-- ── SCREEN: Lobby ── -->
+  <div class="card screen active" id="screen-lobby">
+    <label for="inp-name">Tên người chơi</label>
+    <input id="inp-name" type="text" placeholder="Nhập tên của bạn…" maxlength="20" autocomplete="off">
+
+    <button class="btn btn-primary" onclick="createRoom()">🏠 Tạo phòng mới</button>
+
+    <div class="divider">hoặc</div>
+
+    <label for="inp-room">Mã phòng</label>
+    <input id="inp-room" type="text" placeholder="VD: AB12" maxlength="8" autocomplete="off"
+           style="text-transform:uppercase;letter-spacing:.2em;font-size:1.3rem;margin-bottom:0">
+    <div class="err-msg" id="err-msg"></div>
+
+    <button class="btn btn-secondary" onclick="joinRoom()">🚪 Vào phòng</button>
+  </div>
+
+  <!-- ── SCREEN: Waiting ── -->
+  <div class="card screen" id="screen-wait">
+    <div class="room-badge">
+      <small>Mã phòng của bạn</small>
+      <div class="room-id" id="display-room-id">—</div>
+      <small>Chia sẻ mã này cho bạn bè</small>
+    </div>
+    <div class="wait-msg">
+      Đang chờ đối thủ
+      <div class="dot-loader" style="margin-top:10px">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <button class="btn btn-danger" style="margin-top:24px" onclick="leaveRoom()">↩ Thoát phòng</button>
+  </div>
+
+  <!-- ── SCREEN: Game ── -->
+  <div class="card screen" id="screen-game">
+    <div class="scoreboard">
+      <div class="score-player">
+        <div class="pname" id="me-name">Tôi</div>
+        <div class="pscore" id="me-score" style="color:var(--green)">0</div>
+      </div>
+      <div class="score-vs">VS</div>
+      <div class="score-player">
+        <div class="pname" id="opp-name">Đối thủ</div>
+        <div class="pscore" id="opp-score" style="color:var(--red)">0</div>
+      </div>
+    </div>
+
+    <div class="round-label" id="round-label">Vòng 1</div>
+
+    <div class="choices">
+      <button class="choice-btn" data-val="rock"     onclick="choose('rock')">
+        <span class="icon">✊</span><span class="label">Búa</span>
+      </button>
+      <button class="choice-btn" data-val="paper"    onclick="choose('paper')">
+        <span class="icon">✋</span><span class="label">Bao</span>
+      </button>
+      <button class="choice-btn" data-val="scissors" onclick="choose('scissors')">
+        <span class="icon">✌️</span><span class="label">Kéo</span>
+      </button>
+    </div>
+
+    <div class="status-hint" id="status-hint">Hãy chọn một lựa chọn!</div>
+  </div>
+</div>
+
+<!-- ── Result overlay ── -->
+<div class="result-overlay" id="result-overlay">
+  <div class="result-box">
+    <div class="result-emoji" id="res-emoji">✊</div>
+    <div class="result-title" id="res-title">Hòa!</div>
+    <div class="result-choices">
+      <div class="pill" id="res-me">—</div>
+      <div class="vs">VS</div>
+      <div class="pill" id="res-opp">—</div>
+    </div>
+    <div class="result-score" id="res-score">0 – 0</div>
+    <div class="result-actions">
+      <button class="btn btn-primary btn-sm" onclick="nextRound()">▶ Vòng tiếp</button>
+      <button class="btn btn-secondary btn-sm" onclick="requestRematch()">🔄 Chơi lại</button>
+      <button class="btn btn-danger btn-sm" onclick="leaveRoom()">✕ Thoát</button>
+    </div>
+  </div>
+</div>
+
+<!-- Notification -->
+<div class="notif" id="notif"></div>
+
+<script>
+// ─── Socket ───────────────────────────────────────────────────────────────────
+const socket = io();
+
+let myId = null;
+let myName = '';
+let myRoomId = '';
+let oppId = null;
+let oppName = '';
+let scores = {};
+let currentRound = 1;
+let hasChosen = false;
+
+socket.on('connect', () => { myId = socket.id; });
+
+// ─── Screen helpers ───────────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function notify(msg, type = 'info', duration = 3000) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.className = `notif ${type} show`;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), duration);
+}
+
+// ─── Lobby actions ────────────────────────────────────────────────────────────
+function getName() {
+  return document.getElementById('inp-name').value.trim();
+}
+
+function createRoom() {
+  const name = getName();
+  if (!name) { document.getElementById('inp-name').focus(); return; }
+  myName = name;
+  socket.emit('joinRoom', { name, roomId: '' });
+}
+
+function joinRoom() {
+  const name = getName();
+  const roomId = document.getElementById('inp-room').value.trim().toUpperCase();
+  document.getElementById('err-msg').textContent = '';
+  if (!name) { document.getElementById('inp-name').focus(); return; }
+  if (!roomId) { document.getElementById('inp-room').focus(); return; }
+  myName = name;
+  socket.emit('joinRoom', { name, roomId });
+}
+
+// ─── Room events ─────────────────────────────────────────────────────────────
+socket.on('joinedRoom', ({ roomId, name }) => {
+  myRoomId = roomId;
+  myName = name;
+  document.getElementById('display-room-id').textContent = roomId;
+});
+
+socket.on('waiting', () => {
+  showScreen('screen-wait');
+});
+
+socket.on('error', (msg) => {
+  document.getElementById('err-msg').textContent = msg;
+  notify(msg, 'error');
+});
+
+socket.on('gameStart', ({ players, round, isRematch }) => {
+  // Determine opponent
+  const [p1name, p2name] = players;
+  if (p1name === myName) {
+    oppName = p2name;
+  } else {
+    oppName = p1name;
+  }
+
+  currentRound = round;
+  scores = {};
+  hasChosen = false;
+
+  document.getElementById('me-name').textContent = myName;
+  document.getElementById('opp-name').textContent = oppName;
+  document.getElementById('me-score').textContent = '0';
+  document.getElementById('opp-score').textContent = '0';
+  document.getElementById('round-label').textContent = `Vòng ${round}`;
+  document.getElementById('status-hint').textContent = 'Hãy chọn một lựa chọn!';
+  document.getElementById('status-hint').className = 'status-hint';
+
+  resetChoiceBtns();
+  hideResult();
+  showScreen('screen-game');
+
+  if (isRematch) notify('🔄 Ván mới bắt đầu!', 'success');
+  else notify(`⚔️ ${oppName} đã vào phòng! Bắt đầu thôi!`, 'success');
+});
+
+socket.on('playerLeft', (name) => {
+  notify(`😢 ${name} đã rời phòng`, 'error', 4000);
+  setTimeout(() => {
+    leaveRoom(true);
+  }, 2500);
+});
+
+// ─── Gameplay ─────────────────────────────────────────────────────────────────
+const EMOJI = { rock: '✊', paper: '✋', scissors: '✌️' };
+const VI    = { rock: 'Búa', paper: 'Bao', scissors: 'Kéo' };
+
+function choose(val) {
+  if (hasChosen) return;
+  hasChosen = true;
+
+  socket.emit('choose', val);
+
+  // Visual feedback
+  document.querySelectorAll('.choice-btn').forEach(btn => {
+    btn.disabled = true;
+    if (btn.dataset.val === val) btn.classList.add('mine');
+    else btn.classList.add('selected');
+  });
+
+  document.getElementById('status-hint').textContent = `Bạn chọn ${EMOJI[val]} ${VI[val]} — chờ đối thủ…`;
+  document.getElementById('status-hint').className = 'status-hint waiting-opp';
+}
+
+socket.on('opponentChose', () => {
+  const hint = document.getElementById('status-hint');
+  if (hint.className.includes('waiting-opp')) {
+    hint.textContent = '✓ Cả hai đã chọn xong!';
+  } else {
+    hint.textContent = `${oppName} đã chọn xong — đến lượt bạn!`;
+    hint.style.color = 'var(--yellow)';
+  }
+});
+
+socket.on('roundResult', (data) => {
+  const { round, choices, results, scores: s, players } = data;
+
+  // Map ids
+  players.forEach(p => {
+    if (p.name === myName) myId = p.id;
+    else oppId = p.id;
+  });
+
+  scores = s;
+  currentRound = round + 1;
+
+  const myChoice   = choices[myId];
+  const oppChoice  = choices[oppId];
+  const myResult   = results[myId];
+
+  const meScore  = s[myId]  || 0;
+  const oppScore = s[oppId] || 0;
+
+  // Update scoreboard
+  document.getElementById('me-score').textContent  = meScore;
+  document.getElementById('opp-score').textContent = oppScore;
+
+  showResult(myResult, myChoice, oppChoice, meScore, oppScore, round);
+});
+
+// ─── Result overlay ───────────────────────────────────────────────────────────
+function showResult(result, myChoice, oppChoice, meScore, oppScore, round) {
+  const title   = document.getElementById('res-title');
+  const emoji   = document.getElementById('res-emoji');
+  const resMe   = document.getElementById('res-me');
+  const resOpp  = document.getElementById('res-opp');
+  const resSc   = document.getElementById('res-score');
+
+  resMe.textContent  = `${EMOJI[myChoice]} ${VI[myChoice]}`;
+  resOpp.textContent = `${EMOJI[oppChoice]} ${VI[oppChoice]}`;
+  resSc.innerHTML    = `<strong>${myName}</strong> ${meScore} – ${oppScore} <strong>${oppName}</strong>`;
+  document.getElementById('round-label').textContent = `Vòng ${round}`;
+
+  if (result === 'win') {
+    title.textContent = '🎉 Bạn thắng!';
+    title.className = 'result-title win';
+    emoji.textContent = '🏆';
+  } else if (result === 'lose') {
+    title.textContent = '💀 Bạn thua!';
+    title.className = 'result-title lose';
+    emoji.textContent = '😢';
+  } else {
+    title.textContent = '🤝 Hòa!';
+    title.className = 'result-title draw';
+    emoji.textContent = '😅';
+  }
+
+  document.getElementById('result-overlay').classList.add('show');
+}
+
+function hideResult() {
+  document.getElementById('result-overlay').classList.remove('show');
+}
+
+function nextRound() {
+  hideResult();
+  hasChosen = false;
+  resetChoiceBtns();
+  document.getElementById('round-label').textContent = `Vòng ${currentRound}`;
+  document.getElementById('status-hint').textContent = 'Hãy chọn một lựa chọn!';
+  document.getElementById('status-hint').className = 'status-hint';
+}
+
+function resetChoiceBtns() {
+  document.querySelectorAll('.choice-btn').forEach(btn => {
+    btn.disabled = false;
+    btn.className = 'choice-btn';
+  });
+}
+
+// ─── Rematch ──────────────────────────────────────────────────────────────────
+function requestRematch() {
+  socket.emit('rematch');
+  notify('🔄 Đã gửi yêu cầu chơi lại…', 'info');
+  hideResult();
+}
+
+socket.on('rematchRequest', (name) => {
+  notify(`🔄 ${name} muốn chơi lại!`, 'info', 5000);
+});
+
+// ─── Leave ────────────────────────────────────────────────────────────────────
+function leaveRoom(silent = false) {
+  if (!silent) notify('Đã thoát phòng', 'info');
+  hideResult();
+  showScreen('screen-lobby');
+  document.getElementById('inp-room').value = '';
+  document.getElementById('err-msg').textContent = '';
+  myRoomId = '';
+  oppId = null;
+  oppName = '';
+  scores = {};
+  hasChosen = false;
+  // Reconnect with fresh socket state
+  socket.disconnect().connect();
+}
+
+// ─── Enter key shortcuts ──────────────────────────────────────────────────────
+document.getElementById('inp-name').addEventListener('keydown', e => {
+  if (e.key === 'Enter') createRoom();
+});
+document.getElementById('inp-room').addEventListener('keydown', e => {
+  if (e.key === 'Enter') joinRoom();
+});
+document.getElementById('inp-room').addEventListener('input', e => {
+  e.target.value = e.target.value.toUpperCase();
+});
+</script>
+</body>
+</html>

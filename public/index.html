@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kéo Búa Bao</title>
+<script src="/socket.io/socket.io.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg: #0f0e17;
+    --surface: #1a1829;
+    --surface2: #231f38;
+    --border: #2e2a4a;
+    --accent: #ff6b6b;
+    --accent2: #ffd93d;
+    --accent3: #6bcb77;
+    --accent4: #4d96ff;
+    --text: #fffffe;
+    --muted: #a7a9be;
+    --radius: 16px;
+    --glow-r: 0 0 20px rgba(255,107,107,.4);
+    --glow-y: 0 0 20px rgba(255,217,61,.4);
+    --glow-g: 0 0 20px rgba(107,203,119,.4);
+    --glow-b: 0 0 20px rgba(77,150,255,.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
+  /* ── Starfield bg ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at 20% 20%, rgba(77,150,255,.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(255,107,107,.08) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Header ── */
+  header {
+    width: 100%; text-align: center;
+    padding: 32px 20px 16px;
+    position: relative; z-index: 1;
+  }
+  header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--accent2) 0%, var(--accent) 50%, var(--accent4) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 20px rgba(255,107,107,.3));
+  }
+  header p { color: var(--muted); font-size: .9rem; margin-top: 6px; }
+
+  /* ── Main wrap ── */
+  main {
+    width: 100%; max-width: 860px;
+    padding: 16px 20px 40px;
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column; gap: 20px;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    transition: border-color .2s;
+  }
+  .card h2 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2rem; letter-spacing: 1px;
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card h2 .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent); box-shadow: var(--glow-r);
+    display: inline-block;
+  }
+
+  /* ── Input ── */
+  .input-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  input[type="text"] {
+    flex: 1; min-width: 140px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem; font-weight: 600;
+    padding: 10px 16px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  input[type="text"]:focus {
+    border-color: var(--accent4);
+    box-shadow: 0 0 0 3px rgba(77,150,255,.15);
+  }
+  input[type="text"]::placeholder { color: var(--muted); font-weight: 400; }
+
+  /* ── Buttons ── */
+  .btn {
+    padding: 10px 22px; border: none; border-radius: 10px;
+    font-family: 'Nunito', sans-serif; font-size: .95rem; font-weight: 800;
+    cursor: pointer; transition: all .15s; letter-spacing: .5px;
+    white-space: nowrap;
+  }
+  .btn:active { transform: scale(.96); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent) 0%, #ff8e53 100%);
+    color: #fff; box-shadow: var(--glow-r);
+  }
+  .btn-primary:hover { filter: brightness(1.1); }
+  .btn-secondary {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    color: var(--text);
+  }
+  .btn-secondary:hover { border-color: var(--accent4); color: var(--accent4); }
+  .btn-blue {
+    background: linear-gradient(135deg, var(--accent4) 0%, #7b61ff 100%);
+    color: #fff; box-shadow: var(--glow-b);
+  }
+  .btn-green {
+    background: linear-gradient(135deg, var(--accent3) 0%, #38b27c 100%);
+    color: #fff; box-shadow: var(--glow-g);
+  }
+  .btn:disabled { opacity: .4; cursor: not-allowed; filter: none !important; }
+
+  /* ── Room list ── */
+  #room-list {
+    display: flex; flex-direction: column; gap: 8px;
+    max-height: 220px; overflow-y: auto;
+  }
+  #room-list::-webkit-scrollbar { width: 5px; }
+  #room-list::-webkit-scrollbar-track { background: var(--surface2); border-radius: 4px; }
+  #room-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .room-item {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 12px 16px;
+    transition: border-color .2s;
+  }
+  .room-item:hover { border-color: var(--accent4); }
+  .room-id {
+    font-family: 'Fredoka One', cursive; font-size: 1.1rem;
+    color: var(--accent2); letter-spacing: 2px;
+    min-width: 60px;
+  }
+  .room-host { flex: 1; font-weight: 700; }
+  .room-tag {
+    font-size: .75rem; font-weight: 700; letter-spacing: 1px;
+    padding: 3px 8px; border-radius: 20px;
+    background: rgba(107,203,119,.15); color: var(--accent3);
+    border: 1px solid rgba(107,203,119,.3);
+  }
+  .empty-msg { text-align: center; color: var(--muted); padding: 24px; font-size: .95rem; }
+
+  /* ── Badge: player name ── */
+  #player-badge {
+    display: none;
+    align-items: center; gap: 10px;
+    background: var(--surface2);
+    border: 1.5px solid var(--accent4);
+    border-radius: 30px; padding: 6px 16px 6px 8px;
+    font-weight: 800; font-size: .95rem;
+    box-shadow: 0 0 12px rgba(77,150,255,.2);
+  }
+  #player-badge .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent4), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+  }
+
+  /* ── Alert ── */
+  .alert {
+    padding: 10px 16px; border-radius: 10px;
+    font-size: .9rem; font-weight: 700;
+    display: none; margin-top: 12px;
+  }
+  .alert-err { background: rgba(255,107,107,.1); border: 1px solid rgba(255,107,107,.3); color: var(--accent); }
+  .alert-ok  { background: rgba(107,203,119,.1); border: 1px solid rgba(107,203,119,.3); color: var(--accent3); }
+
+  /* ── GAME SCREEN ── */
+  #game-screen {
+    display: none;
+    flex-direction: column; gap: 20px;
+    animation: slideUp .4s ease;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .game-header {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 10px;
+  }
+  .room-badge {
+    font-family: 'Fredoka One', cursive; letter-spacing: 2px; font-size: 1.1rem;
+    background: var(--surface2); border: 1.5px solid var(--border);
+    padding: 6px 16px; border-radius: 20px;
+    color: var(--accent2);
+  }
+
+  /* vs panel */
+  .vs-panel {
+    display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px;
+    align-items: center;
+  }
+  .player-panel {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 16px; text-align: center;
+    transition: border-color .3s, box-shadow .3s;
+  }
+  .player-panel.me { border-color: var(--accent4); box-shadow: 0 0 16px rgba(77,150,255,.15); }
+  .player-panel.opponent { border-color: var(--accent); box-shadow: 0 0 16px rgba(255,107,107,.1); }
+  .player-panel .label { font-size: .75rem; font-weight: 700; letter-spacing: 1px; color: var(--muted); margin-bottom: 6px; }
+  .player-panel .pname { font-family: 'Fredoka One', cursive; font-size: 1.2rem; }
+  .player-panel .choice-display {
+    font-size: 3rem; margin-top: 14px; min-height: 56px;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform .3s;
+  }
+  .player-panel .chosen-badge {
+    margin-top: 8px; font-size: .8rem; font-weight: 700;
+    color: var(--accent3); letter-spacing: .5px;
+    min-height: 20px;
+  }
+  .vs-label {
+    font-family: 'Fredoka One', cursive; font-size: 1.6rem;
+    color: var(--muted);
+  }
+
+  /* Status bar */
+  .status-bar {
+    text-align: center; padding: 12px;
+    background: var(--surface2); border: 1.5px solid var(--border);
+    border-radius: 10px; font-weight: 700; letter-spacing: .5px;
+    font-size: .95rem; color: var(--accent2);
+    min-height: 46px; display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Choice buttons */
+  .choice-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  }
+  .choice-btn {
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 10px;
+    cursor: pointer; font-family: 'Nunito', sans-serif;
+    transition: all .2s;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .choice-btn .icon { font-size: 2.8rem; }
+  .choice-btn .name { font-weight: 800; font-size: .85rem; letter-spacing: .5px; color: var(--muted); }
+  .choice-btn:hover:not(:disabled) {
+    transform: translateY(-4px);
+    border-color: var(--accent2);
+    box-shadow: var(--glow-y);
+    background: rgba(255,217,61,.05);
+  }
+  .choice-btn:hover:not(:disabled) .name { color: var(--accent2); }
+  .choice-btn:disabled { opacity: .4; cursor: not-allowed; }
+  .choice-btn.selected {
+    border-color: var(--accent4);
+    background: rgba(77,150,255,.08);
+    box-shadow: var(--glow-b);
+  }
+
+  /* Result overlay */
+  #result-panel {
+    display: none;
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px; text-align: center;
+    animation: pop .35s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: scale(.8); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  #result-panel .result-emoji { font-size: 3.5rem; }
+  #result-panel .result-title {
+    font-family: 'Fredoka One', cursive; font-size: 2rem; margin: 8px 0;
+  }
+  #result-panel .result-detail { color: var(--muted); font-size: .95rem; margin-bottom: 20px; }
+  .result-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+  /* Waiting indicator */
+  .waiting-dots span {
+    animation: blink 1.2s infinite;
+    display: inline-block;
+  }
+  .waiting-dots span:nth-child(2) { animation-delay: .2s; }
+  .waiting-dots span:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%,100%{opacity:.2} 50%{opacity:1} }
+
+  /* ── Screens ── */
+  #lobby-screen { display: flex; flex-direction: column; gap: 20px; animation: slideUp .4s ease; }
+  #game-screen  { display: none; flex-direction: column; gap: 20px; }
+
+  /* ── Toast ── */
+  #toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--surface2); border: 1.5px solid var(--border);
+    padding: 10px 20px; border-radius: 30px; font-weight: 700; font-size: .9rem;
+    z-index: 100; opacity: 0; transition: opacity .3s;
+    pointer-events: none;
+  }
+  #toast.show { opacity: 1; }
+
+  @media(max-width:500px) {
+    .vs-panel { grid-template-columns: 1fr; }
+    .vs-label { display: none; }
+    .choice-grid { grid-template-columns: repeat(3,1fr); }
+    .choice-btn .icon { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>✊ Kéo Búa Bao 🤚</h1>
+  <p>Multiplayer · Real-time · Socket.IO</p>
+</header>
+
+<main>
+
+<!-- ══════════ LOBBY SCREEN ══════════ -->
+<div id="lobby-screen">
+
+  <!-- Player setup -->
+  <div class="card">
+    <h2><span class="dot" style="background:var(--accent4);box-shadow:var(--glow-b)"></span> Đặt tên của bạn</h2>
+    <div class="input-row">
+      <input id="name-input" type="text" placeholder="Nhập biệt danh..." maxlength="20" autocomplete="off">
+      <button class="btn btn-blue" onclick="setName()">Xác nhận ✓</button>
+    </div>
+    <div id="player-badge" style="margin-top:14px; display:none;">
+      <div class="avatar">🎮</div>
+      <span id="badge-name"></span>
+    </div>
+    <div id="name-alert" class="alert alert-err"></div>
+  </div>
+
+  <!-- Create room -->
+  <div class="card">
+    <h2><span class="dot" style="background:var(--accent2);box-shadow:var(--glow-y)"></span> Tạo phòng mới</h2>
+    <button class="btn btn-primary" onclick="createRoom()" style="width:100%">+ Tạo phòng</button>
+    <div id="create-alert" class="alert alert-err"></div>
+  </div>
+
+  <!-- Join by ID -->
+  <div class="card">
+    <h2><span class="dot" style="background:var(--accent3);box-shadow:var(--glow-g)"></span> Vào phòng bằng mã</h2>
+    <div class="input-row">
+      <input id="room-id-input" type="text" placeholder="Nhập mã phòng (VD: A1B2C)..." maxlength="5"
+             style="text-transform:uppercase;letter-spacing:2px" autocomplete="off">
+      <button class="btn btn-green" onclick="joinRoom()">Vào phòng →</button>
+    </div>
+    <div id="join-alert" class="alert alert-err"></div>
+  </div>
+
+  <!-- Room list -->
+  <div class="card">
+    <h2>
+      <span class="dot" style="background:var(--accent);box-shadow:var(--glow-r)"></span>
+      Phòng đang mở
+      <span id="room-count" style="font-size:.8rem;color:var(--muted);font-family:'Nunito',sans-serif;font-weight:600;margin-left:4px"></span>
+    </h2>
+    <div id="room-list"><p class="empty-msg">Chưa có phòng nào. Hãy tạo phòng!</p></div>
+  </div>
+
+</div>
+
+<!-- ══════════ GAME SCREEN ══════════ -->
+<div id="game-screen">
+
+  <div class="game-header">
+    <div class="room-badge" id="room-badge">PHÒNG: -----</div>
+    <div id="player-badge-game" style="display:flex;align-items:center;gap:8px;">
+      <span style="color:var(--muted);font-size:.85rem;">Bạn là</span>
+      <strong id="badge-game-name" style="color:var(--accent4)"></strong>
+    </div>
+    <button class="btn btn-secondary" onclick="leaveRoom()" style="font-size:.85rem;padding:8px 14px">✕ Rời phòng</button>
+  </div>
+
+  <!-- vs panel -->
+  <div class="vs-panel">
+    <div class="player-panel me">
+      <div class="label">BẠN</div>
+      <div class="pname" id="my-name">---</div>
+      <div class="choice-display" id="my-choice-display">🤔</div>
+      <div class="chosen-badge" id="my-chosen"></div>
+    </div>
+    <div class="vs-label">VS</div>
+    <div class="player-panel opponent">
+      <div class="label">ĐỐI THỦ</div>
+      <div class="pname" id="opp-name">Đang chờ...</div>
+      <div class="choice-display" id="opp-choice-display">💤</div>
+      <div class="chosen-badge" id="opp-chosen"></div>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar" id="status-bar">Đang chờ đối thủ vào phòng...</div>
+
+  <!-- Choice buttons -->
+  <div class="choice-grid" id="choice-grid">
+    <button class="choice-btn" onclick="makeChoice('rock')" id="btn-rock">
+      <span class="icon">✊</span>
+      <span class="name">KÉO</span>
+    </button>
+    <button class="choice-btn" onclick="makeChoice('scissors')" id="btn-scissors">
+      <span class="icon">✌️</span>
+      <span class="name">BÚA</span>
+    </button>
+    <button class="choice-btn" onclick="makeChoice('paper')" id="btn-paper">
+      <span class="icon">🤚</span>
+      <span class="name">BAO</span>
+    </button>
+  </div>
+
+  <!-- Result -->
+  <div id="result-panel">
+    <div class="result-emoji" id="result-emoji"></div>
+    <div class="result-title" id="result-title"></div>
+    <div class="result-detail" id="result-detail"></div>
+    <div class="result-btns">
+      <button class="btn btn-green" onclick="requestRematch()">🔄 Đánh lại</button>
+      <button class="btn btn-secondary" onclick="leaveRoom()">← Về lobby</button>
+    </div>
+  </div>
+
+</div>
+
+</main>
+
+<div id="toast"></div>
+
+<script>
+// ── Socket ──────────────────────────────────────────────────────────────────
+const socket = io();
+let playerName = '';
+let currentRoom = '';
+const choiceEmoji = { rock:'✊', scissors:'✌️', paper:'🤚' };
+const choiceLabel = { rock:'KÉO', scissors:'BÚA', paper:'BAO' };
+
+// ── Utils ────────────────────────────────────────────────────────────────────
+function toast(msg, duration=2500) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), duration);
+}
+
+function showAlert(id, msg, type='err') {
+  const el = document.getElementById(id);
+  el.className = `alert alert-${type}`;
+  el.textContent = msg;
+  el.style.display = 'block';
+  if (type === 'ok') setTimeout(() => el.style.display='none', 3000);
+}
+
+function hideAlert(id) {
+  document.getElementById(id).style.display = 'none';
+}
+
+function setStatus(msg) {
+  document.getElementById('status-bar').innerHTML = msg;
+}
+
+function disableChoiceBtns(disabled) {
+  ['rock','scissors','paper'].forEach(c => {
+    document.getElementById(`btn-${c}`).disabled = disabled;
+  });
+}
+
+function resetChoiceDisplay() {
+  document.getElementById('my-choice-display').textContent = '🤔';
+  document.getElementById('opp-choice-display').textContent = '❓';
+  document.getElementById('my-chosen').textContent = '';
+  document.getElementById('opp-chosen').textContent = '';
+  ['rock','scissors','paper'].forEach(c =>
+    document.getElementById(`btn-${c}`).classList.remove('selected')
+  );
+}
+
+function showScreen(name) {
+  document.getElementById('lobby-screen').style.display = name==='lobby' ? 'flex' : 'none';
+  document.getElementById('game-screen').style.display  = name==='game'  ? 'flex' : 'none';
+}
+
+// ── Lobby actions ─────────────────────────────────────────────────────────────
+function setName() {
+  const val = document.getElementById('name-input').value.trim();
+  if (!val) return showAlert('name-alert', 'Vui lòng nhập tên!');
+  playerName = val;
+  hideAlert('name-alert');
+  document.getElementById('player-badge').style.display = 'flex';
+  document.getElementById('badge-name').textContent = playerName;
+  document.getElementById('badge-game-name').textContent = playerName;
+  toast(`Chào mừng, ${playerName}! 🎉`);
+}
+
+document.getElementById('name-input').addEventListener('keydown', e => { if(e.key==='Enter') setName(); });
+document.getElementById('room-id-input').addEventListener('input', e => {
+  e.target.value = e.target.value.toUpperCase();
+});
+document.getElementById('room-id-input').addEventListener('keydown', e => { if(e.key==='Enter') joinRoom(); });
+
+function createRoom() {
+  if (!playerName) return showAlert('create-alert', 'Hãy đặt tên trước!');
+  socket.emit('create_room', { playerName }, ({ ok, roomId, msg }) => {
+    if (!ok) return showAlert('create-alert', msg);
+    currentRoom = roomId;
+    enterGameScreen(roomId, playerName, null);
+  });
+}
+
+function joinRoom(roomIdArg) {
+  if (!playerName) return showAlert('join-alert', 'Hãy đặt tên trước!');
+  const roomId = roomIdArg || document.getElementById('room-id-input').value.trim().toUpperCase();
+  if (!roomId) return showAlert('join-alert', 'Nhập mã phòng!');
+  socket.emit('join_room', { roomId, playerName }, ({ ok, msg }) => {
+    if (!ok) return showAlert('join-alert', msg);
+    currentRoom = roomId;
+  });
+}
+
+// ── Game screen setup ────────────────────────────────────────────────────────
+function enterGameScreen(roomId, me, opponent) {
+  showScreen('game');
+  document.getElementById('room-badge').textContent = `PHÒNG: ${roomId}`;
+  document.getElementById('my-name').textContent = me;
+  document.getElementById('opp-name').textContent = opponent || 'Đang chờ...';
+  document.getElementById('opp-choice-display').textContent = opponent ? '❓' : '💤';
+  document.getElementById('result-panel').style.display = 'none';
+  document.getElementById('choice-grid').style.display = 'grid';
+  disableChoiceBtns(!opponent);
+  if (opponent) {
+    setStatus(`⚔️ Trận bắt đầu! Chọn đi nào...`);
+  } else {
+    setStatus(`<span class="waiting-dots">Đang chờ đối thủ<span>.</span><span>.</span><span>.</span></span>`);
+  }
+}
+
+function makeChoice(choice) {
+  disableChoiceBtns(true);
+  document.getElementById(`btn-${choice}`).classList.add('selected');
+  document.getElementById('my-choice-display').textContent = choiceEmoji[choice];
+  document.getElementById('my-chosen').textContent = `Đã chọn: ${choiceLabel[choice]}`;
+  setStatus(`<span class="waiting-dots">Đang chờ đối thủ chọn<span>.</span><span>.</span><span>.</span></span>`);
+  socket.emit('make_choice', { choice });
+}
+
+function requestRematch() {
+  document.getElementById('result-panel').style.display = 'none';
+  document.getElementById('choice-grid').style.display = 'grid';
+  resetChoiceDisplay();
+  disableChoiceBtns(false);
+  setStatus('⚔️ Đánh lại! Chọn đi nào...');
+  socket.emit('rematch');
+}
+
+function leaveRoom() {
+  location.reload();
+}
+
+// ── Room list ────────────────────────────────────────────────────────────────
+socket.on('room_list', (rooms) => {
+  const list = document.getElementById('room-list');
+  document.getElementById('room-count').textContent = rooms.length ? `(${rooms.length})` : '';
+  if (!rooms.length) {
+    list.innerHTML = '<p class="empty-msg">Chưa có phòng nào. Hãy tạo phòng!</p>';
+    return;
+  }
+  list.innerHTML = rooms.map(r => `
+    <div class="room-item">
+      <span class="room-id">${r.id}</span>
+      <span class="room-host">${r.host}</span>
+      <span class="room-tag">Chờ 1 người</span>
+      <button class="btn btn-secondary" style="font-size:.82rem;padding:7px 14px"
+              onclick="joinRoom('${r.id}')">Vào →</button>
+    </div>
+  `).join('');
+});
+
+// ── Game events ──────────────────────────────────────────────────────────────
+socket.on('game_start', ({ players }) => {
+  const me = playerName;
+  const opp = players.find(n => n !== me);
+  currentRoom = currentRoom;
+  enterGameScreen(currentRoom, me, opp);
+  document.getElementById('opp-name').textContent = opp;
+  toast(`${opp} đã vào phòng! ⚔️`);
+});
+
+socket.on('opponent_chose', () => {
+  document.getElementById('opp-choice-display').textContent = '✅';
+  document.getElementById('opp-chosen').textContent = 'Đã chọn xong!';
+});
+
+socket.on('game_result', ({ p1, p2, winner }) => {
+  // Find my data and opp data
+  const myData  = p1.name === playerName ? p1 : p2;
+  const oppData = p1.name === playerName ? p2 : p1;
+
+  document.getElementById('my-choice-display').textContent  = choiceEmoji[myData.choice];
+  document.getElementById('opp-choice-display').textContent = choiceEmoji[oppData.choice];
+  document.getElementById('my-chosen').textContent  = choiceLabel[myData.choice];
+  document.getElementById('opp-chosen').textContent = choiceLabel[oppData.choice];
+
+  setTimeout(() => showResult(winner, myData, oppData), 600);
+});
+
+function showResult(winner, myData, oppData) {
+  document.getElementById('choice-grid').style.display = 'none';
+  const panel = document.getElementById('result-panel');
+  panel.style.display = 'block';
+
+  let emoji, title, detail;
+  if (!winner) {
+    emoji = '🤝'; title = 'HÒA!';
+    detail = `${choiceEmoji[myData.choice]} vs ${choiceEmoji[oppData.choice]} — Cùng chọn giống nhau!`;
+    panel.style.borderColor = 'var(--accent2)';
+  } else if (winner === playerName) {
+    emoji = '🏆'; title = 'BẠN THẮNG!';
+    detail = `${choiceEmoji[myData.choice]} ${choiceLabel[myData.choice]} thắng ${choiceEmoji[oppData.choice]} ${choiceLabel[oppData.choice]}`;
+    panel.style.borderColor = 'var(--accent3)';
+  } else {
+    emoji = '💀'; title = 'BẠN THUA!';
+    detail = `${choiceEmoji[oppData.choice]} ${choiceLabel[oppData.choice]} thắng ${choiceEmoji[myData.choice]} ${choiceLabel[myData.choice]}`;
+    panel.style.borderColor = 'var(--accent)';
+  }
+  document.getElementById('result-emoji').textContent  = emoji;
+  document.getElementById('result-title').textContent  = title;
+  document.getElementById('result-detail').textContent = detail;
+  setStatus('Trận đã kết thúc. Chơi tiếp hay về lobby?');
+}
+
+socket.on('rematch_start', () => {
+  document.getElementById('result-panel').style.display = 'none';
+  document.getElementById('result-panel').style.borderColor = 'var(--border)';
+  document.getElementById('choice-grid').style.display = 'grid';
+  resetChoiceDisplay();
+  disableChoiceBtns(false);
+  setStatus('⚔️ Đánh lại! Chọn đi nào...');
+});
+
+socket.on('opponent_left', () => {
+  toast('Đối thủ đã rời phòng 😢');
+  document.getElementById('opp-name').textContent = 'Đang chờ...';
+  document.getElementById('opp-choice-display').textContent = '💤';
+  document.getElementById('opp-chosen').textContent = '';
+  document.getElementById('result-panel').style.display = 'none';
+  document.getElementById('choice-grid').style.display = 'grid';
+  resetChoiceDisplay();
+  disableChoiceBtns(true);
+  setStatus(`<span class="waiting-dots">Đang chờ đối thủ mới<span>.</span><span>.</span><span>.</span></span>`);
+});
+
+socket.on('connect', () => {
+  console.log('✓ Đã kết nối tới server:', socket.id);
+});
+socket.on('disconnect', () => {
+  toast('Mất kết nối tới server!');
+});
+</script>
+</body>
+</html>
