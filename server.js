@@ -285,6 +285,5 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`\n\x1b[1m\x1b[32m✔ Server Kéo Búa Bao đang chạy\x1b[0m`);
   console.log(`  \x1b[34m➜  http://localhost:${PORT}\x1b[0m\n`);
-  console.log(`  ⏱  Thời gian chọn: \x1b[33m${CHOICE_TIME}s\x1b[0m mỗi vòng\n`);
   console.log(`\x1b[90m${"─".repeat(50)}\x1b[0m`);
 });
