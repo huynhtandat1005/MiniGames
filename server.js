@@ -4,12 +4,35 @@ const path = require("path");
 const { Server } = require("socket.io");
 
 const server = http.createServer((req, res) => {
-  let filePath = path.join(__dirname, req.url === "/" ? "client.html" : req.url);
+  // Loại bỏ các tham số query (nếu có) để tránh lỗi tìm đường dẫn file (ví dụ: script.js?v=1)
+  const urlPath = req.url.split('?')[0];
+  
+  let filePath = path.join(__dirname, urlPath === "/" ? "client.html" : urlPath);
   const ext = path.extname(filePath);
-  const contentType = ext === ".html" ? "text/html" : "text/plain";
+
+  // 1. Tạo bảng ánh xạ các định dạng file (MIME Types)
+  const mimeTypes = {
+    ".html": "text/html",
+    ".css": "text/css",
+    ".js": "text/javascript",
+    ".json": "application/json",
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".gif": "image/gif",
+    ".svg": "image/svg+xml",
+    ".ico": "image/x-icon"
+  };
+
+  // 2. Lấy content type tương ứng, nếu không có trong bảng thì mặc định là text/plain
+  const contentType = mimeTypes[ext] || "text/plain";
 
   fs.readFile(filePath, (err, data) => {
-    if (err) { res.writeHead(404); res.end("Not found"); return; }
+    if (err) { 
+      res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" }); 
+      res.end("Không tìm thấy file"); 
+      return; 
+    }
+    // 3. Trả về đúng Content-Type mà trình duyệt yêu cầu
     res.writeHead(200, { "Content-Type": contentType });
     res.end(data);
   });
@@ -177,7 +200,7 @@ io.on("connection", (socket) => {
         if (rooms[roomId] && rooms[roomId].status === "playing") {
           io.to(roomId).emit("roundBegin", { round: room.round });
           startChoiceTimer(roomId);
-          log(`  ⏱ Bắt đầu đếm ${CHOICE_TIME}s — phòng ${roomId}`);
+          log(` 🕗 Bắt đầu đếm ${CHOICE_TIME}s — phòng ${roomId}`);
         }
       }, 3500);
     }
