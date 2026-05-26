@@ -2,6 +2,7 @@
 const socket = io();
 
 let myId = null, myName = '', myRoomId = '', oppId = null, oppName = '';
+let opponentHasChosen = false;
 let myChar = 0, oppChar = 0;
 let scores = {}, currentRound = 1, hasChosen = false, timerTotal = 10;
 
@@ -121,7 +122,7 @@ function runCountdown(callback) {
     { text: '3', cls: 'cd-3', sfx: (typeof SFX !== 'undefined') ? SFX.countdown3 : null },
     { text: '2', cls: 'cd-2', sfx: (typeof SFX !== 'undefined') ? SFX.countdown2 : null },
     { text: '1', cls: 'cd-1', sfx: (typeof SFX !== 'undefined') ? SFX.countdown1 : null },
-    { text: 'GO!', cls: 'cd-go', sfx: (typeof SFX !== 'undefined') ? SFX.go : null },
+    { text: '⚔️', cls: 'cd-go', sfx: (typeof SFX !== 'undefined') ? SFX.go : null },
   ];
   
   if (window._cdT) { clearTimeout(window._cdT); window._cdT = null; }
@@ -192,6 +193,7 @@ socket.on('gameStart', ({ players, round, isRematch, chars }) => {
 });
 
 socket.on('roundBegin', ({ round }) => {
+  opponentHasChosen = false;
   currentRound = round; 
   hasChosen = false;
   resetChoiceBtns(); 
@@ -200,8 +202,13 @@ socket.on('roundBegin', ({ round }) => {
   document.getElementById('status-hint').textContent = '';
   document.getElementById('status-hint').className = 'status-hint';
   runCountdown(() => {
-    document.getElementById('status-hint').textContent = 'Hãy chọn một lựa chọn!';
+    document.getElementById('status-hint').textContent =
+      'Hãy chọn một lựa chọn!';
+
     setChoiceBtnsEnabled(true);
+
+    // báo server bắt đầu đếm CHOICE_TIME
+    socket.emit('startTimer');
   });
 });
 
@@ -240,26 +247,56 @@ const VI    = { rock: 'Búa', paper: 'Bao', scissors: 'Kéo' };
 
 function choose(val) {
   if (hasChosen) return;
+
   hasChosen = true;
+
   if (typeof SFX !== 'undefined') SFX.choose();
+
   socket.emit('choose', val);
+
   setChoiceBtnsEnabled(false);
+
   document.querySelectorAll('.choice-btn').forEach(btn => {
-    if (btn.dataset.val === val) btn.classList.add('mine'); 
-    else btn.classList.add('selected');
+    if (btn.dataset.val === val)
+      btn.classList.add('mine');
+    else
+      btn.classList.add('selected');
   });
-  document.getElementById('status-hint').textContent = `Bạn chọn ${EMOJI[val]} ${VI[val]} — chờ đối thủ…`;
-  document.getElementById('status-hint').className = 'status-hint waiting-opp';
+
+  const hint = document.getElementById('status-hint');
+
+  if (opponentHasChosen) {
+    hint.textContent = '✓ Cả hai đã chọn xong !';
+    hint.className = 'status-hint success';
+  } else {
+    hint.textContent =
+      `Bạn chọn ${EMOJI[val]} ${VI[val]} — chờ đối thủ…`;
+    hint.className = 'status-hint waiting-opp';
+  }
 }
 
 socket.on('opponentChose', () => {
+  opponentHasChosen = true;
+
   if (typeof SFX !== 'undefined') SFX.oppChose();
+
   const hint = document.getElementById('status-hint');
   const sb = document.querySelector('.scoreboard');
+
   sb.classList.add('opp-chose-pulse');
-  sb.addEventListener('animationend', () => sb.classList.remove('opp-chose-pulse'), { once: true });
-  if (hasChosen) hint.textContent = '✓ Cả hai đã chọn xong!';
-  else { hint.textContent = `${oppName} đã chọn — nhanh lên!`; hint.style.color = 'var(--yellow)'; }
+  sb.addEventListener(
+    'animationend',
+    () => sb.classList.remove('opp-chose-pulse'),
+    { once: true }
+  );
+
+  if (hasChosen) {
+    hint.textContent = '✓ Cả hai đã chọn xong !';
+    hint.className = 'status-hint success';
+  } else {
+    hint.textContent = `${oppName} đã chọn — nhanh lên!`;
+    hint.className = 'status-hint waiting-opp';
+  }
 });
 
 socket.on('timedOut', () => {
@@ -295,8 +332,18 @@ socket.on('roundResult', (data) => {
 function showResult(result, myChoice, oppChoice, meScore, oppScore, round, timedOutFlag) {
   const title = document.getElementById('res-title'), emoji = document.getElementById('res-emoji');
   const tBadge = document.getElementById('res-timeout-badge');
-  document.getElementById('res-me').textContent = `${EMOJI[myChoice]} ${VI[myChoice]}`;
-  document.getElementById('res-opp').textContent = `${EMOJI[oppChoice]} ${VI[oppChoice]}`;
+  const myText =
+    myChoice === 'timeout'
+      ? '⏰ Bạn không chọn'
+      : `${EMOJI[myChoice]} ${VI[myChoice]}`;
+
+  const oppText =
+    oppChoice === 'timeout'
+      ? '⏰ Đối thủ không chọn'
+      : `${EMOJI[oppChoice]} ${VI[oppChoice]}`;
+
+  document.getElementById('res-me').textContent = myText;
+  document.getElementById('res-opp').textContent = oppText;
   document.getElementById('res-score').innerHTML = `<strong>${myName}</strong> ${meScore} – ${oppScore} <strong>${oppName}</strong>`;
   document.getElementById('round-label').textContent = `Vòng ${round}`;
   tBadge.style.display = timedOutFlag ? 'inline-block' : 'none';
