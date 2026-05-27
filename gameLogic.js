@@ -96,13 +96,10 @@ function showStartOverlay(p1Name, p2Name, roundNum, p1Char, p2Char) {
     document.getElementById('start-char-p1').innerHTML = `<svg viewBox="0 0 80 100"><use href="${CHARS[p1Char].symbol}"/></svg>`;
     document.getElementById('start-char-p2').innerHTML = `<svg viewBox="0 0 80 100"><use href="${CHARS[p2Char].symbol}"/></svg>`;
   }
-  // Kích hoạt lại animation bằng cách reset lại lớp CSS
-  ['start-p1', 'start-p2'].forEach(id => {
+  // Kích hoạt lại animation bằng cách reset lại lớp CSS (null-safe)
+  ['start-p1', 'start-p2', 'start-fighter-p1', 'start-fighter-p2'].forEach(id => {
     const el = document.getElementById(id);
-    el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
-  });
-  ['start-fighter-p1', 'start-fighter-p2'].forEach(id => {
-    const el = document.getElementById(id);
+    if (!el) return;
     el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
   });
 
@@ -294,7 +291,7 @@ socket.on('opponentChose', () => {
     hint.textContent = '✓ Cả hai đã chọn xong !';
     hint.className = 'status-hint success';
   } else {
-    hint.textContent = `${oppName} đã chọn — nhanh lên!`;
+    hint.textContent = 'Đối thủ đã chọn xong !';
     hint.className = 'status-hint waiting-opp';
   }
 });
@@ -357,15 +354,10 @@ function hideResult() {
   document.getElementById('result-overlay').classList.remove('show'); 
 }
 
-function nextRound() {
+function goHome() {
   if (typeof SFX !== 'undefined') SFX.click();
-  hideResult(); 
-  hasChosen = false;
-  resetChoiceBtns(); 
-  setChoiceBtnsEnabled(false);
-  document.getElementById('round-label').textContent = `Vòng ${currentRound}`;
-  document.getElementById('status-hint').textContent = 'Đang chờ cả hai sẵn sàng…';
-  socket.emit('nextRound');
+  hideResult();
+  leaveRoom(false);
 }
 
 function resetChoiceBtns() { 
@@ -417,4 +409,4 @@ document.addEventListener('touchend', e => {
 document.addEventListener('wheel', e => { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
 document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && ['+', '-', '=', '0'].includes(e.key)) e.preventDefault(); }, { passive: false });
 ['gesturestart', 'gesturechange', 'gestureend'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
-if (screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(() => {});
+if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {});

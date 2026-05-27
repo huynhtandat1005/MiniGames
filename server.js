@@ -1,38 +1,62 @@
 const http = require("http");
-const fs = require("fs");
+const fs   = require("fs");
 const path = require("path");
 const { Server } = require("socket.io");
-// Lưu ý: server.js và client.html phải nằm cùng thư mục để đường dẫn file hoạt động đúng.
+
+// ─── Log system ───────────────────────────────────────────────────────────────
+const LOG_FILE = path.join(__dirname, "SERVER_LOG.txt");
+
+// Xoá ANSI color codes để log file sạch
+function stripAnsi(str) {
+  return str.replace(/\x1b\[[0-9;]*m/g, "");
+}
+
+// Ghi cả ra console (có màu) lẫn file (không màu)
+function log(msg) {
+  const t  = new Date().toLocaleTimeString("vi-VN");
+  const dt = new Date().toLocaleString("vi-VN");
+  const consoleLine = `\x1b[36m[${t}]\x1b[0m ${msg}`;
+  const fileLine    = `[${dt}] ${stripAnsi(msg)}`;
+  console.log(consoleLine);
+  fs.appendFile(LOG_FILE, fileLine + "\n", () => {});
+}
+
+// Log có cấu trúc cho các sự kiện trong phòng
+// Cú pháp: [roomId] [action] [detail]
+function logRoom(roomId, action, detail) {
+  const t  = new Date().toLocaleTimeString("vi-VN");
+  const dt = new Date().toLocaleString("vi-VN");
+  const structured = `[${roomId}] [${action}] [${detail}]`;
+  const consoleLine = `\x1b[36m[${t}]\x1b[0m ${structured}`;
+  const fileLine    = `[${dt}] ${structured}`;
+  console.log(consoleLine);
+  fs.appendFile(LOG_FILE, fileLine + "\n", () => {});
+}
+
+// Ghi dòng phân cách khi server khởi động
+function logSeparator(msg) {
+  const line = "─".repeat(60);
+  const dt   = new Date().toLocaleString("vi-VN");
+  fs.appendFile(LOG_FILE, `\n${line}\n[${dt}] ${msg}\n${line}\n`, () => {});
+}
+
+// ─── HTTP server ──────────────────────────────────────────────────────────────
 const server = http.createServer((req, res) => {
-  // Loại bỏ các tham số query (nếu có) để tránh lỗi tìm đường dẫn file (ví dụ: script.js?v=1)
-  const urlPath = req.url.split('?')[0];
-  
-  let filePath = path.join(__dirname, urlPath === "/" ? "client.html" : urlPath);
-  const ext = path.extname(filePath);
-
-  // 1. Tạo bảng ánh xạ các định dạng file (MIME Types)
+  const urlPath = req.url.split("?")[0];
+  let filePath  = path.join(__dirname, urlPath === "/" ? "client.html" : urlPath);
+  const ext     = path.extname(filePath);
   const mimeTypes = {
-    ".html": "text/html",
-    ".css": "text/css",
-    ".js": "text/javascript",
-    ".json": "application/json",
-    ".png": "image/png",
-    ".jpg": "image/jpeg",
-    ".gif": "image/gif",
-    ".svg": "image/svg+xml",
-    ".ico": "image/x-icon"
+    ".html": "text/html", ".css": "text/css", ".js": "text/javascript",
+    ".json": "application/json", ".png": "image/png", ".jpg": "image/jpeg",
+    ".gif": "image/gif", ".svg": "image/svg+xml", ".ico": "image/x-icon",
   };
-
-  // 2. Lấy content type tương ứng, nếu không có trong bảng thì mặc định là text/plain
   const contentType = mimeTypes[ext] || "text/plain";
-
   fs.readFile(filePath, (err, data) => {
-    if (err) { 
-      res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" }); 
-      res.end("Không tìm thấy file"); 
-      return; 
+    if (err) {
+      res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+      res.end("Không tìm thấy file");
+      return;
     }
-    // 3. Trả về đúng Content-Type mà trình duyệt yêu cầu
     res.writeHead(200, { "Content-Type": contentType });
     res.end(data);
   });
@@ -41,43 +65,44 @@ const server = http.createServer((req, res) => {
 const io = new Server(server, { cors: { origin: "*" } });
 
 // ─── Config ───────────────────────────────────────────────────────────────────
-const CHOICE_TIME = 10; // seconds to make a choice
+const CHOICE_TIME = 10;
 
 // ─── State ────────────────────────────────────────────────────────────────────
-const rooms   = {}; // roomId → { players, status, round, scores, timers }
-const players = {}; // socketId → { name, roomId }
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-function log(msg) {
-  const t = new Date().toLocaleTimeString("vi-VN");
-  console.log(`\x1b[36m[${t}]\x1b[0m ${msg}`);
-}
-// Dùng để log thông tin phòng trong các sự kiện, giúp dễ theo dõi hơn.
+const rooms   = {};
+const players = {};
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 function roomInfo(roomId) {
   const r = rooms[roomId];
   if (!r) return "—";
   const names = r.players.map(p => p.name).join(" vs ");
   return `Phòng \x1b[33m${roomId}\x1b[0m [${r.players.length}/2] ${names}`;
 }
-// Kết quả: "win", "lose", "draw"
+
 function getResult(a, b) {
   if (a === b) return "draw";
   if ((a==="rock"&&b==="scissors")||(a==="scissors"&&b==="paper")||(a==="paper"&&b==="rock")) return "win";
   return "lose";
 }
 
-const EMOJI = { rock:"✊", paper:"✋", scissors:"✌️" };
-const VI    = { rock:"Búa", paper:"Bao", scissors:"Kéo" };
+const EMOJI = { rock: "✊", paper: "✋", scissors: "✌️" };
+const VI    = { rock: "Búa", paper: "Bao", scissors: "Kéo" };
+const EN    = { rock: "ROCK", paper: "PAPER", scissors: "SCISSORS", timeout: "TIMEOUT" };
 
-// ─── Characters ───────────────────────────────────────────────────────────────
 const CHARS = [
   { id: "ninja",  name: "Ninja"  },
   { id: "mage",   name: "Mage"   },
   { id: "knight", name: "Knight" },
   { id: "robot",  name: "Robot"  },
 ];
-function charName(idx) { return CHARS[idx]?.name ?? `Nhân vật ${idx}`; }
+function charName(idx) { return CHARS[idx]?.name ?? `Char${idx}`; }
 
-// ─── Timer helpers ────────────────────────────────────────────────────────────
+// Helper: "dat (Ninja)"
+function playerLabel(p) {
+  return `${p.name} (${charName(p.charIdx ?? 0)})`;
+}
+
+// ─── Timer helpers ─────────────────────────────────────────────────────────────
 function clearRoomTimers(room) {
   if (room.countdownInterval) { clearInterval(room.countdownInterval); room.countdownInterval = null; }
   if (room.timeoutTimer)      { clearTimeout(room.timeoutTimer);       room.timeoutTimer = null; }
@@ -86,7 +111,6 @@ function clearRoomTimers(room) {
 function startChoiceTimer(roomId) {
   const room = rooms[roomId];
   if (!room) return;
-
   clearRoomTimers(room);
 
   let remaining = CHOICE_TIME;
@@ -95,11 +119,7 @@ function startChoiceTimer(roomId) {
   room.countdownInterval = setInterval(() => {
     remaining--;
     io.to(roomId).emit("timerTick", { remaining });
-
-    if (remaining <= 0) {
-      clearInterval(room.countdownInterval);
-      room.countdownInterval = null;
-    }
+    if (remaining <= 0) { clearInterval(room.countdownInterval); room.countdownInterval = null; }
   }, 1000);
 
   room.timeoutTimer = setTimeout(() => {
@@ -108,33 +128,31 @@ function startChoiceTimer(roomId) {
     if (!room || room.status !== "playing") return;
 
     if (room.bothChose) {
-      // Both chose in time — just resolve normally
       room.bothChose = false;
       resolveRound(roomId);
       return;
     }
 
-    // Không random — đánh dấu sentinel "timeout", bên đó tự động thua
     room.players.forEach(p => {
       if (!p.choice) {
         p.timedOut = true;
-        p.choice = "timeout";
+        p.choice   = "timeout";
         io.to(p.id).emit("timedOut");
-        log(`\x1b[31mHẾT GIỜ\x1b[0m  ${p.name} không chọn — phòng ${roomId}`);
+        logRoom(roomId, "timeout", playerLabel(p));
       }
     });
 
     resolveRound(roomId);
   }, CHOICE_TIME * 1000);
 }
-// ─── Game logic ───────────────────────────────────────────────────────────────
+
+// ─── Game logic ────────────────────────────────────────────────────────────────
 function resolveRound(roomId) {
   const room = rooms[roomId];
   if (!room) return;
   const [p1, p2] = room.players;
   if (!p1.choice || !p2.choice) return;
 
-  // Nếu timeout sentinel → không gọi getResult, xử lý trực tiếp
   let finalR1, finalR2;
   if (p1.timedOut && p2.timedOut) {
     finalR1 = "draw"; finalR2 = "draw";
@@ -147,31 +165,37 @@ function resolveRound(roomId) {
     finalR1 = r; finalR2 = r === "draw" ? "draw" : r === "win" ? "lose" : "win";
   }
 
-  if (finalR1 === "win")       room.scores[p1.id] = (room.scores[p1.id]||0) + 1;
-  else if (finalR2 === "win")  room.scores[p2.id] = (room.scores[p2.id]||0) + 1;
+  if (finalR1 === "win")      room.scores[p1.id] = (room.scores[p1.id]||0) + 1;
+  else if (finalR2 === "win") room.scores[p2.id] = (room.scores[p2.id]||0) + 1;
 
   const roundResult = {
-    round: room.round,
-    choices:  { [p1.id]: p1.choice,  [p2.id]: p2.choice  },
-    results:  { [p1.id]: finalR1,    [p2.id]: finalR2     },
-    timedOut: { [p1.id]: !!p1.timedOut, [p2.id]: !!p2.timedOut },
+    round:    room.round,
+    choices:  { [p1.id]: p1.choice,      [p2.id]: p2.choice      },
+    results:  { [p1.id]: finalR1,         [p2.id]: finalR2         },
+    timedOut: { [p1.id]: !!p1.timedOut,   [p2.id]: !!p2.timedOut  },
     scores:   { [p1.id]: room.scores[p1.id]||0, [p2.id]: room.scores[p2.id]||0 },
     players:  [{ id: p1.id, name: p1.name }, { id: p2.id, name: p2.name }],
   };
 
   io.to(roomId).emit("roundResult", roundResult);
 
-  const sym = finalR1==="win"?">":(finalR1==="lose"?"<":"=");
-  log(`  Kết quả vòng ${room.round}: ${p1.name}(${EMOJI[p1.choice]}${p1.timedOut?"⏰":""} ) ${sym} ${p2.name}(${EMOJI[p2.choice]}${p2.timedOut?"⏰":""} ) | ${room.scores[p1.id]||0}-${room.scores[p2.id]||0}`);
+  // Structured result log
+  const sym    = finalR1 === "win" ? ">" : finalR1 === "lose" ? "<" : "=";
+  const c1     = EN[p1.choice] ?? p1.choice.toUpperCase();
+  const c2     = EN[p2.choice] ?? p2.choice.toUpperCase();
+  const label1 = playerLabel(p1);
+  const label2 = playerLabel(p2);
+  logRoom(roomId, "result",
+    `${label1}(${c1}) ${sym} ${label2}(${c2})`
+  );
 
-  // Reset for next round
   p1.choice = null; p1.timedOut = false;
   p2.choice = null; p2.timedOut = false;
   room.timerStarted = false;
   room.round++;
 }
 
-// ─── Socket events ────────────────────────────────────────────────────────────
+// ─── Socket events ─────────────────────────────────────────────────────────────
 io.on("connection", (socket) => {
   log(`\x1b[32m+\x1b[0m Kết nối mới: \x1b[35m${socket.id}\x1b[0m`);
 
@@ -179,11 +203,9 @@ io.on("connection", (socket) => {
     name    = (name   || "Ẩn danh").trim().slice(0, 20);
     roomId  = (roomId || "").trim().toUpperCase().slice(0, 8);
     charIdx = charIdx ?? 0;
-    const charLabel = `${charName(charIdx)}`;
 
-    const isCreating = !roomId; // Không truyền roomId → tạo phòng mới
+    const isCreating = !roomId;
 
-    // ── Vào phòng có sẵn: validate trước khi làm bất cứ điều gì ──────────────
     if (!isCreating) {
       if (!rooms[roomId]) {
         socket.emit("error", "Phòng không tồn tại!");
@@ -202,71 +224,64 @@ io.on("connection", (socket) => {
       }
     }
 
-    // ── Tạo phòng mới nếu không có roomId ────────────────────────────────────
     if (isCreating) {
       roomId = Math.random().toString(36).slice(2, 6).toUpperCase();
-      rooms[roomId] = { players: [], status: "waiting", round: 1, scores: {}, rematchVotes: null, timerStarted: false };
+      rooms[roomId] = {
+        players: [], status: "waiting", round: 1,
+        scores: {}, rematchVotes: null, timerStarted: false,
+      };
     }
-    // ── Lưu thông tin người chơi và tham gia phòng ─────────────────────────────
+
+    // Kiểm tra trùng tên
     players[socket.id] = { name, roomId };
     const duplicated = Object.entries(players).some(
-      ([id, p]) =>
-        id !== socket.id &&
+      ([id, p]) => id !== socket.id &&
         p.name.trim().toLowerCase() === name.trim().toLowerCase()
     );
-    // Kiểm tra trùng tên người chơi (case-insensitive, ignore whitespace)
     if (duplicated) {
-      socket.emit(
-        "error",
-        "Tên người chơi này đang được sử dụng!"
-      );
+      socket.emit("error", "Tên người chơi này đang được sử dụng!");
+      delete players[socket.id];
       return;
     }
+
     socket.join(roomId);
-    // Lưu thông tin người chơi vào phòng
     const room = rooms[roomId];
     room.players.push({ id: socket.id, name, choice: null, timedOut: false, charIdx });
     room.scores[socket.id] = 0;
     socket.emit("joinedRoom", { roomId, name });
-    // ── Xử lý logic phòng sau khi có người chơi mới ─────────────────────────────
+
     if (room.players.length === 1) {
       socket.emit("waiting", "Đang chờ đối thủ vào phòng…");
-      log(`\x1b[34mTẠO PHÒNG\x1b[0m [${roomId}] ${name} (${charLabel})`);
+      logRoom(roomId, "create", playerLabel({ name, charIdx }));
     } else {
       room.status = "playing";
       room.round  = 1;
-      const names = room.players.map(p => p.name);
-      const chars = room.players.map(p => p.charIdx);
+      const names      = room.players.map(p => p.name);
+      const chars      = room.players.map(p => p.charIdx);
       const charLabels = room.players.map(p => charName(p.charIdx));
-      log(`\x1b[32mBẮT ĐẦU\x1b[0m   [${roomId}] ${names[0]} (${charLabels[0]}) ⚔️  ${names[1]} (${charLabels[1]})`);
+      logRoom(roomId, "join", playerLabel({ name, charIdx }));
+      log(`\x1b[32mBẮT ĐẦU\x1b[0m [${roomId}] ${names[0]} (${charLabels[0]}) ⚔️ ${names[1]} (${charLabels[1]})`);
       io.to(roomId).emit("gameStart", { players: names, round: room.round, chars });
 
-      // Chỉ gửi roundBegin sau intro overlay (~3.2s).
-      // startChoiceTimer sẽ được kích hoạt khi client emit "startTimer"
-      // (sau khi FIGHT animation kết thúc ở phía client).
       setTimeout(() => {
         if (rooms[roomId] && rooms[roomId].status === "playing") {
           io.to(roomId).emit("roundBegin", { round: room.round });
-          log(` ⚔️  roundBegin gửi — phòng ${roomId}`);
         }
       }, 3500);
     }
   });
 
-  // Client emit "startTimer" sau khi FIGHT animation xong
   socket.on("startTimer", () => {
     const pInfo = players[socket.id];
     if (!pInfo) return;
     const { roomId } = pInfo;
     const room = rooms[roomId];
     if (!room || room.status !== "playing") return;
-    // Chỉ start khi chưa có timer đang chạy (người đầu tiên emit kích hoạt cho cả phòng)
     if (room.timerStarted) return;
     room.timerStarted = true;
     startChoiceTimer(roomId);
-    log(` 🕗 Bắt đầu đếm ${CHOICE_TIME}s — phòng ${roomId}`);
   });
-  // Client chọn rock/paper/scissors
+
   socket.on("choose", (choice) => {
     const pInfo = players[socket.id];
     if (!pInfo) return;
@@ -277,101 +292,100 @@ io.on("connection", (socket) => {
     if (!player || player.choice) return;
 
     player.choice = choice;
-    log(`\x1b[33m${pInfo.name}\x1b[0m chọn \x1b[35m${EMOJI[choice]} ${VI[choice]}\x1b[0m — phòng ${roomId}`);
+    const choiceLabel = EN[choice] ?? choice.toUpperCase();
+    logRoom(roomId, `chosen (${choiceLabel})`, playerLabel(player));
+    log(`\x1b[33m${pInfo.name}\x1b[0m chọn \x1b[35m${EMOJI[choice] ?? choice} ${VI[choice] ?? choice}\x1b[0m — phòng ${roomId}`);
     socket.to(roomId).emit("opponentChose");
 
     if (room.players.every(p => p.choice)) {
-      // Do NOT clear the timer — let it run to 0 naturally for suspense.
-      // resolveRound will be called by the timeout handler when time is up.
-      // Mark the room so timeout handler knows to resolve (not force choices).
       room.bothChose = true;
     }
   });
 
-  // Client signals ready for next round
   socket.on("nextRound", () => {
     const pInfo = players[socket.id];
     if (!pInfo) return;
     const { roomId } = pInfo;
     const room = rooms[roomId];
     if (!room) return;
-
     if (!room.nextRoundVotes) room.nextRoundVotes = new Set();
     room.nextRoundVotes.add(socket.id);
-
     if (room.nextRoundVotes.size >= room.players.length) {
       room.nextRoundVotes.clear();
-
       room.timerStarted = false;
-      room.bothChose = false;
-
-      io.to(roomId).emit("roundBegin", {
-        round: room.round
-      });
+      room.bothChose    = false;
+      io.to(roomId).emit("roundBegin", { round: room.round });
     }
   });
-  // Client muốn chơi lại sau khi trận đấu kết thúc
+
   socket.on("rematch", () => {
     const pInfo = players[socket.id];
     if (!pInfo) return;
     const { roomId } = pInfo;
     const room = rooms[roomId];
     if (!room) return;
-
     if (!room.rematchVotes) room.rematchVotes = new Set();
     room.rematchVotes.add(socket.id);
     log(`🔄 ${pInfo.name} muốn chơi lại — phòng ${roomId}`);
-    // Nếu cả 2 người chơi đều muốn chơi lại, reset trạng thái phòng và bắt đầu trận mới
+
     if (room.rematchVotes.size >= 2) {
       room.rematchVotes.clear();
       clearRoomTimers(room);
       room.scores = {};
-      room.players.forEach(p => { p.choice=null; p.timedOut=false; room.scores[p.id]=0; });
-      room.round  = 1;
-      room.status = "playing";
-      room.bothChose = false;
+      room.players.forEach(p => { p.choice = null; p.timedOut = false; room.scores[p.id] = 0; });
+      room.round       = 1;
+      room.status      = "playing";
+      room.bothChose   = false;
+      room.timerStarted = false;
       const rematchChars = room.players.map(p => p.charIdx);
-      io.to(roomId).emit("gameStart", { players: room.players.map(p=>p.name), round: 1, isRematch: true, chars: rematchChars });
+      logRoom(roomId, "rematch",
+        room.players.map(p => playerLabel(p)).join(" vs ")
+      );
+      io.to(roomId).emit("gameStart", {
+        players: room.players.map(p => p.name), round: 1, isRematch: true, chars: rematchChars,
+      });
       setTimeout(() => {
-        if (rooms[roomId]) {
-          io.to(roomId).emit("roundBegin", { round: 1 });
-        }
+        if (rooms[roomId]) io.to(roomId).emit("roundBegin", { round: 1 });
       }, 3500);
       log(`🔄 Chơi lại — ${roomInfo(roomId)}`);
     } else {
       socket.to(roomId).emit("rematchRequest", pInfo.name);
     }
   });
-  // Client ngắt kết nối
+
   socket.on("disconnect", () => {
     const pInfo = players[socket.id];
     if (pInfo) {
       const { name, roomId } = pInfo;
-      log(`\x1b[31m-\x1b[0m Ngắt kết nối: \x1b[35m${name}\x1b[0m (${socket.id})`);
+      log(`\x1b[31m-\x1b[0m Ngắt kết nối: \x1b[35m${name}\x1b[0m`);
       const room = rooms[roomId];
       if (room) {
+        const p = room.players.find(p => p.id === socket.id);
         clearRoomTimers(room);
         room.players = room.players.filter(p => p.id !== socket.id);
         delete room.scores[socket.id];
         if (room.players.length === 0) {
           delete rooms[roomId];
-          log(`🗑  Phòng ${roomId} đã xóa (trống)`);
+          logRoom(roomId, "closed", `${name} rời — phòng trống`);
         } else {
           room.status = "waiting";
           io.to(roomId).emit("playerLeft", name);
-          log(`  ${roomInfo(roomId)} — ${name} rời phòng`);
+          logRoom(roomId, "leave", p ? playerLabel(p) : name);
         }
       }
       delete players[socket.id];
     } else {
-      log(`\x1b[31m-\x1b[0m Ngắt kết nối: \x1b[35m${socket.id}\x1b[0m (chưa đặt tên)`);
+      log(`\x1b[31m-\x1b[0m Ngắt kết nối: \x1b[35m${socket.id}`);
     }
   });
 });
-// ─── Start server ─────────────────────────────────────────────────────────────
+
+// ─── Start ─────────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`\n\x1b[1m\x1b[32m✔ Server Kéo Búa Bao đang chạy\x1b[0m`);
-  console.log(`  \x1b[34m➜  http://localhost:${PORT}\x1b[0m\n`);
+  console.log(`  \x1b[34m➜  http://localhost:${PORT}\x1b[0m`);
+  console.log(`  \x1b[90mLog file: SERVER_LOG.txt\x1b[0m\n`);
   console.log(`\x1b[90m${"─".repeat(50)}\x1b[0m`);
+  logSeparator(`SERVER STARTED — http://localhost:${PORT}`);
 });
