@@ -2,7 +2,7 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const { Server } = require("socket.io");
-
+// Lưu ý: server.js và client.html phải nằm cùng thư mục để đường dẫn file hoạt động đúng.
 const server = http.createServer((req, res) => {
   // Loại bỏ các tham số query (nếu có) để tránh lỗi tìm đường dẫn file (ví dụ: script.js?v=1)
   const urlPath = req.url.split('?')[0];
@@ -46,19 +46,19 @@ const CHOICE_TIME = 10; // seconds to make a choice
 // ─── State ────────────────────────────────────────────────────────────────────
 const rooms   = {}; // roomId → { players, status, round, scores, timers }
 const players = {}; // socketId → { name, roomId }
-
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 function log(msg) {
   const t = new Date().toLocaleTimeString("vi-VN");
   console.log(`\x1b[36m[${t}]\x1b[0m ${msg}`);
 }
-
+// Dùng để log thông tin phòng trong các sự kiện, giúp dễ theo dõi hơn.
 function roomInfo(roomId) {
   const r = rooms[roomId];
   if (!r) return "—";
   const names = r.players.map(p => p.name).join(" vs ");
   return `Phòng \x1b[33m${roomId}\x1b[0m [${r.players.length}/2] ${names}`;
 }
-
+// Kết quả: "win", "lose", "draw"
 function getResult(a, b) {
   if (a === b) return "draw";
   if ((a==="rock"&&b==="scissors")||(a==="scissors"&&b==="paper")||(a==="paper"&&b==="rock")) return "win";
@@ -127,7 +127,7 @@ function startChoiceTimer(roomId) {
     resolveRound(roomId);
   }, CHOICE_TIME * 1000);
 }
-
+// ─── Game logic ───────────────────────────────────────────────────────────────
 function resolveRound(roomId) {
   const room = rooms[roomId];
   if (!room) return;
@@ -207,13 +207,14 @@ io.on("connection", (socket) => {
       roomId = Math.random().toString(36).slice(2, 6).toUpperCase();
       rooms[roomId] = { players: [], status: "waiting", round: 1, scores: {}, rematchVotes: null, timerStarted: false };
     }
-
+    // ── Lưu thông tin người chơi và tham gia phòng ─────────────────────────────
     players[socket.id] = { name, roomId };
     const duplicated = Object.entries(players).some(
       ([id, p]) =>
         id !== socket.id &&
         p.name.trim().toLowerCase() === name.trim().toLowerCase()
     );
+    // Kiểm tra trùng tên người chơi (case-insensitive, ignore whitespace)
     if (duplicated) {
       socket.emit(
         "error",
@@ -222,12 +223,12 @@ io.on("connection", (socket) => {
       return;
     }
     socket.join(roomId);
-
+    // Lưu thông tin người chơi vào phòng
     const room = rooms[roomId];
     room.players.push({ id: socket.id, name, choice: null, timedOut: false, charIdx });
     room.scores[socket.id] = 0;
     socket.emit("joinedRoom", { roomId, name });
-
+    // ── Xử lý logic phòng sau khi có người chơi mới ─────────────────────────────
     if (room.players.length === 1) {
       socket.emit("waiting", "Đang chờ đối thủ vào phòng…");
       log(`\x1b[34mTẠO PHÒNG\x1b[0m [${roomId}] ${name} (${charLabel})`);
@@ -265,7 +266,7 @@ io.on("connection", (socket) => {
     startChoiceTimer(roomId);
     log(` 🕗 Bắt đầu đếm ${CHOICE_TIME}s — phòng ${roomId}`);
   });
-
+  // Client chọn rock/paper/scissors
   socket.on("choose", (choice) => {
     const pInfo = players[socket.id];
     if (!pInfo) return;
@@ -309,7 +310,7 @@ io.on("connection", (socket) => {
       });
     }
   });
-
+  // Client muốn chơi lại sau khi trận đấu kết thúc
   socket.on("rematch", () => {
     const pInfo = players[socket.id];
     if (!pInfo) return;
@@ -320,7 +321,7 @@ io.on("connection", (socket) => {
     if (!room.rematchVotes) room.rematchVotes = new Set();
     room.rematchVotes.add(socket.id);
     log(`🔄 ${pInfo.name} muốn chơi lại — phòng ${roomId}`);
-
+    // Nếu cả 2 người chơi đều muốn chơi lại, reset trạng thái phòng và bắt đầu trận mới
     if (room.rematchVotes.size >= 2) {
       room.rematchVotes.clear();
       clearRoomTimers(room);
@@ -341,7 +342,7 @@ io.on("connection", (socket) => {
       socket.to(roomId).emit("rematchRequest", pInfo.name);
     }
   });
-
+  // Client ngắt kết nối
   socket.on("disconnect", () => {
     const pInfo = players[socket.id];
     if (pInfo) {
@@ -367,7 +368,7 @@ io.on("connection", (socket) => {
     }
   });
 });
-
+// ─── Start server ─────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`\n\x1b[1m\x1b[32m✔ Server Kéo Búa Bao đang chạy\x1b[0m`);

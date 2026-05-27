@@ -49,7 +49,7 @@ function showPopupErr(msg) {
   void inp.offsetWidth; 
   inp.classList.add('shake');
 }
-
+// Khi người dùng xác nhận tham gia phòng qua popup
 function confirmJoinRoom() {
   const roomId = document.getElementById('popup-room-input').value.trim().toUpperCase();
   const name = document.getElementById('inp-name').value.trim();
@@ -69,16 +69,16 @@ function createRoom() {
   myChar = myCharIdx;
   socket.emit('joinRoom', { name, roomId: '', charIdx: myChar });
 }
-
+// Khi server xác nhận đã vào phòng thành công
 socket.on('joinedRoom', ({ roomId, name }) => {
   myRoomId = roomId; 
   myName = name;
   document.getElementById('display-room-id').textContent = roomId;
   if (typeof SFX !== 'undefined') SFX.join();
 });
-
+// Khi server thông báo đang chờ đối thủ
 socket.on('waiting', () => showScreen('screen-wait'));
-
+// Khi server gửi lỗi (ví dụ: phòng đầy, trùng tên, mã phòng không tồn tại...)
 socket.on('error', (msg) => {
   const ov = document.getElementById('join-popup-overlay');
   if (ov.classList.contains('visible')) showPopupErr(msg);
@@ -91,12 +91,12 @@ function showStartOverlay(p1Name, p2Name, roundNum, p1Char, p2Char) {
   document.getElementById('start-round-label').textContent = roundNum > 1 ? `VÒNG ${roundNum}` : 'TRẬN ĐẤU BẮT ĐẦU!';
   document.getElementById('start-p1').textContent = p1Name;
   document.getElementById('start-p2').textContent = p2Name;
-
+  // Nếu có biểu tượng nhân vật, hiển thị chúng
   if (typeof CHARS !== 'undefined') {
     document.getElementById('start-char-p1').innerHTML = `<svg viewBox="0 0 80 100"><use href="${CHARS[p1Char].symbol}"/></svg>`;
     document.getElementById('start-char-p2').innerHTML = `<svg viewBox="0 0 80 100"><use href="${CHARS[p2Char].symbol}"/></svg>`;
   }
-
+  // Kích hoạt lại animation bằng cách reset lại lớp CSS
   ['start-p1', 'start-p2'].forEach(id => {
     const el = document.getElementById(id);
     el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
@@ -127,7 +127,7 @@ function runCountdown(callback) {
   
   if (window._cdT) { clearTimeout(window._cdT); window._cdT = null; }
   ov.classList.add('visible');
-  
+  // Hàm đệ quy để hiển thị từng bước của countdown
   function step(i) {
     if (i >= seq.length) {
       ov.classList.remove('visible');
@@ -167,7 +167,7 @@ socket.on('gameStart', ({ players, round, isRematch, chars }) => {
   currentRound = round; 
   scores = {}; 
   hasChosen = false;
-  
+  // Cập nhật giao diện với thông tin người chơi và điểm số
   document.getElementById('me-name').textContent  = myName;
   document.getElementById('opp-name').textContent = oppName;
   document.getElementById('me-score').textContent  = '0';
@@ -180,7 +180,7 @@ socket.on('gameStart', ({ players, round, isRematch, chars }) => {
     setAvatarSVG('me-avatar',  myChar);
     setAvatarSVG('opp-avatar', oppChar);
   }
-
+  // Reset trạng thái nút chọn và ẩn kết quả, thanh thời gian
   resetChoiceBtns(); 
   hideResult(); 
   hideTimer();
@@ -191,7 +191,7 @@ socket.on('gameStart', ({ players, round, isRematch, chars }) => {
 
   showStartOverlay(myName, oppName, round, myChar, oppChar);
 });
-
+// Khi server thông báo bắt đầu vòng mới
 socket.on('roundBegin', ({ round }) => {
   opponentHasChosen = false;
   currentRound = round; 
@@ -244,7 +244,7 @@ function hideTimer() {
 // ── Vòng lặp Gameplay chính ────────────────────────────────────────────────────
 const EMOJI = { rock: '✊', paper: '✋', scissors: '✌️' };
 const VI    = { rock: 'Búa', paper: 'Bao', scissors: 'Kéo' };
-
+// Khi người chơi chọn một lựa chọn
 function choose(val) {
   if (hasChosen) return;
 
@@ -274,7 +274,7 @@ function choose(val) {
     hint.className = 'status-hint waiting-opp';
   }
 }
-
+// Khi server thông báo đối thủ đã chọn xong
 socket.on('opponentChose', () => {
   opponentHasChosen = true;
 
@@ -298,7 +298,7 @@ socket.on('opponentChose', () => {
     hint.className = 'status-hint waiting-opp';
   }
 });
-
+// Khi server thông báo người chơi hết giờ mà chưa chọn
 socket.on('timedOut', () => {
   if (typeof SFX !== 'undefined') SFX.timeout();
   hasChosen = true; 
@@ -309,7 +309,7 @@ socket.on('timedOut', () => {
   document.getElementById('status-hint').className = 'status-hint timed-out';
   notify('⏰ Hết giờ — tự động thua vòng này!', 'error', 4000);
 });
-
+// Khi server gửi kết quả vòng đấu
 socket.on('roundResult', (data) => {
   const { round, choices, results, timedOut, scores: s, players } = data;
   players.forEach(p => { if (p.name === myName) myId = p.id; else oppId = p.id; });
@@ -341,7 +341,7 @@ function showResult(result, myChoice, oppChoice, meScore, oppScore, round, timed
     oppChoice === 'timeout'
       ? '⏰ Đối thủ không chọn'
       : `${EMOJI[oppChoice]} ${VI[oppChoice]}`;
-
+  // Cập nhật nội dung kết quả và điểm số trên giao diện
   document.getElementById('res-me').textContent = myText;
   document.getElementById('res-opp').textContent = oppText;
   document.getElementById('res-score').innerHTML = `<strong>${myName}</strong> ${meScore} – ${oppScore} <strong>${oppName}</strong>`;
@@ -382,9 +382,9 @@ function requestRematch() {
   notify('🔄 Đã gửi yêu cầu chơi lại…', 'info'); 
   hideResult(); 
 }
-
+// Khi server thông báo đối thủ muốn chơi lại
 socket.on('rematchRequest', (name) => notify(`🔄 ${name} muốn chơi lại!`, 'info', 5000));
-
+// Khi server thông báo trận đấu kết thúc và ai đó rời phòng
 socket.on('playerLeft', (name) => { 
   notify(`😢 ${name} đã rời phòng`, 'error', 4000); 
   setTimeout(() => leaveRoom(true), 2500); 
