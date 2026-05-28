@@ -197,7 +197,7 @@ function resolveRound(roomId) {
 
 // ─── Socket events ─────────────────────────────────────────────────────────────
 io.on("connection", (socket) => {
-  log(`\x1b[32m+\x1b[0m Kết nối mới: \x1b[35m${socket.id}\x1b[0m`);
+  log(`\x1b[32m+\x1b[0m Connected: \x1b[35m${socket.id}\x1b[0m`);
 
   socket.on("joinRoom", ({ name, roomId, charIdx }) => {
     name    = (name   || "Ẩn danh").trim().slice(0, 20);
@@ -209,17 +209,17 @@ io.on("connection", (socket) => {
     if (!isCreating) {
       if (!rooms[roomId]) {
         socket.emit("error", "Phòng không tồn tại!");
-        log(`✗ ${name} vào phòng không tồn tại: ${roomId}`);
+        log(`X ${name} enter wrong room ID: ${roomId}`);
         return;
       }
       if (rooms[roomId].status !== "waiting") {
-        socket.emit("error", "Phòng đang trong trận, không thể vào!");
-        log(`✗ ${name} cố vào phòng đang chơi: ${roomId}`);
+        socket.emit("error", "Phòng đã bắt đầu!");
+        log(`X ${name} tried to enter a room that is already in progress: ${roomId}`);
         return;
       }
       if (rooms[roomId].players.length >= 2) {
         socket.emit("error", "Phòng đã đầy (2/2)!");
-        log(`✗ ${name} cố vào phòng đầy: ${roomId}`);
+        log(`X ${name} tried to enter a full room: ${roomId}`);
         return;
       }
     }
@@ -260,7 +260,7 @@ io.on("connection", (socket) => {
       const chars      = room.players.map(p => p.charIdx);
       const charLabels = room.players.map(p => charName(p.charIdx));
       logRoom(roomId, "join", playerLabel({ name, charIdx }));
-      log(`\x1b[32mBẮT ĐẦU\x1b[0m [${roomId}] ${names[0]} (${charLabels[0]}) ⚔️ ${names[1]} (${charLabels[1]})`);
+      log(`[START]\x1b[0m [${roomId}] ${names[0]} (${charLabels[0]}) VS ${names[1]} (${charLabels[1]})`);
       io.to(roomId).emit("gameStart", { players: names, round: room.round, chars });
 
       setTimeout(() => {
@@ -294,7 +294,6 @@ io.on("connection", (socket) => {
     player.choice = choice;
     const choiceLabel = EN[choice] ?? choice.toUpperCase();
     logRoom(roomId, `chosen (${choiceLabel})`, playerLabel(player));
-    log(`\x1b[33m${pInfo.name}\x1b[0m chọn \x1b[35m${EMOJI[choice] ?? choice} ${VI[choice] ?? choice}\x1b[0m — phòng ${roomId}`);
     socket.to(roomId).emit("opponentChose");
 
     if (room.players.every(p => p.choice)) {
@@ -326,7 +325,7 @@ io.on("connection", (socket) => {
     if (!room) return;
     if (!room.rematchVotes) room.rematchVotes = new Set();
     room.rematchVotes.add(socket.id);
-    log(`🔄 ${pInfo.name} muốn chơi lại — phòng ${roomId}`);
+    log(`🔄 ${pInfo.name} wants to rematch — room ${roomId}`);
 
     if (room.rematchVotes.size >= 2) {
       room.rematchVotes.clear();
@@ -357,7 +356,7 @@ io.on("connection", (socket) => {
     const pInfo = players[socket.id];
     if (pInfo) {
       const { name, roomId } = pInfo;
-      log(`\x1b[31m-\x1b[0m Ngắt kết nối: \x1b[35m${name}\x1b[0m`);
+      log(`\x1b[31m-\x1b[0m Disconnected: \x1b[35m${name}\x1b[0m`);
       const room = rooms[roomId];
       if (room) {
         const p = room.players.find(p => p.id === socket.id);
@@ -366,7 +365,7 @@ io.on("connection", (socket) => {
         delete room.scores[socket.id];
         if (room.players.length === 0) {
           delete rooms[roomId];
-          logRoom(roomId, "closed", `${name} rời — phòng trống`);
+          logRoom(roomId, "closed", `${name} disconnected, room closed`);
         } else {
           room.status = "waiting";
           io.to(roomId).emit("playerLeft", name);
@@ -375,7 +374,7 @@ io.on("connection", (socket) => {
       }
       delete players[socket.id];
     } else {
-      log(`\x1b[31m-\x1b[0m Ngắt kết nối: \x1b[35m${socket.id}`);
+      log(`\x1b[31m-\x1b[0m Disconnected: \x1b[35m${socket.id}`);
     }
   });
 });
