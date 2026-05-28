@@ -449,6 +449,7 @@ input[type=text]::placeholder { color:var(--muted); font-weight:400; }
 .result-choices .pill{ background:var(--surface); border-radius:10px; padding:5px 11px; font-size:.82rem; }
 .result-score  { color:var(--muted); font-size:.8rem; margin-bottom:12px; }
 .result-score strong { color:var(--text); }
+.result-score { font-size:.8rem; color:var(--muted); margin:2px 0 8px; text-align:center; }
 .result-actions { display:flex; gap:7px; justify-content:center; flex-wrap:wrap; }
 
 /* ══════════════════════════════════════════════════════════

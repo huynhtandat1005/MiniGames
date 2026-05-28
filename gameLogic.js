@@ -5,6 +5,8 @@ let myId = null, myName = '', myRoomId = '', oppId = null, oppName = '';
 let opponentHasChosen = false;
 let myChar = 0, oppChar = 0;
 let scores = {}, currentRound = 1, hasChosen = false, timerTotal = 10;
+let timerDone = false;          // true khi timer đã về 0
+let pendingResult = null;       // lưu roundResult nếu timer chưa xong
 
 socket.on('connect', () => { myId = socket.id; });
 
@@ -193,6 +195,8 @@ socket.on('roundBegin', ({ round }) => {
   opponentHasChosen = false;
   currentRound = round; 
   hasChosen = false;
+  timerDone = false;
+  pendingResult = null;
   resetChoiceBtns(); 
   hideResult();
   document.getElementById('round-label').textContent = `Vòng ${round}`;
@@ -210,13 +214,33 @@ socket.on('roundBegin', ({ round }) => {
 });
 
 // ── Đồng bộ hóa thanh thời gian (Timer) ──────────────────────────────────────────
-socket.on('timerStart', ({ seconds }) => { timerTotal = seconds; showTimer(seconds); });
+let _timerDoneTimeout = null;
+
+function _onTimerDone() {
+  if (timerDone) return;
+  timerDone = true;
+  if (pendingResult) {
+    const r = pendingResult; pendingResult = null;
+    _applyRoundResult(r);
+  }
+}
+
+socket.on('timerStart', ({ seconds }) => {
+  timerTotal = seconds;
+  timerDone  = false;
+  showTimer(seconds);
+  // Fallback: client tu kich hoat sau (seconds+0.8)s phong tick cuoi bi miss
+  if (_timerDoneTimeout) clearTimeout(_timerDoneTimeout);
+  _timerDoneTimeout = setTimeout(_onTimerDone, (seconds + 0.8) * 1000);
+});
+
 socket.on('timerTick', ({ remaining }) => {
   updateTimer(remaining);
   if (typeof SFX !== 'undefined') {
-    if (remaining <= 5) SFX.suspense(remaining); 
+    if (remaining <= 5) SFX.suspense(remaining);
     else SFX.tick();
   }
+  if (remaining <= 0) _onTimerDone();
 });
 
 function showTimer(s) {
@@ -308,23 +332,43 @@ socket.on('timedOut', () => {
 });
 // Khi server gửi kết quả vòng đấu
 socket.on('roundResult', (data) => {
-  const { round, choices, results, timedOut, scores: s, players } = data;
+  // Cập nhật điểm ngay lập tức
+  const { players } = data;
   players.forEach(p => { if (p.name === myName) myId = p.id; else oppId = p.id; });
-  scores = s; 
+  document.getElementById('me-score').textContent  = data.scores[myId]  || 0;
+  document.getElementById('opp-score').textContent = data.scores[oppId] || 0;
+
+  if (timerDone) {
+    // Timer đã hết → hiện popup ngay
+    _applyRoundResult(data);
+  } else {
+    // Timer đang chạy → giữ lại, sẽ hiện khi timerTick về 0
+    pendingResult = data;
+  }
+});
+
+// Khi server báo cả hai đã chọn xong (timer vẫn còn chạy)
+socket.on('bothChosen', () => {
+  const hint = document.getElementById('status-hint');
+  hint.textContent = '✓ Cả hai đã chọn xong !';
+  hint.className = 'status-hint success';
+});
+
+function _applyRoundResult(data) {
+  const { round, choices, results, timedOut, scores: s } = data;
+  scores = s;
   currentRound = round + 1;
   const myChoice = choices[myId], oppChoice = choices[oppId];
   const myResult = results[myId], myTO = timedOut && timedOut[myId];
-  document.getElementById('me-score').textContent = s[myId] || 0;
-  document.getElementById('opp-score').textContent = s[oppId] || 0;
   hideTimer();
-  
+
   if (typeof SFX !== 'undefined') {
-    if (myResult === 'win') SFX.win(); 
-    else if (myResult === 'lose') SFX.lose(); 
+    if (myResult === 'win') SFX.win();
+    else if (myResult === 'lose') SFX.lose();
     else SFX.draw();
   }
   setTimeout(() => showResult(myResult, myChoice, oppChoice, s[myId] || 0, s[oppId] || 0, round, myTO), 300);
-});
+}
 
 function showResult(result, myChoice, oppChoice, meScore, oppScore, round, timedOutFlag) {
   const title = document.getElementById('res-title'), emoji = document.getElementById('res-emoji');
@@ -389,6 +433,7 @@ function leaveRoom(silent = false) {
   hideTimer();
   showScreen('screen-lobby');
   myRoomId = ''; oppId = null; oppName = ''; scores = {}; hasChosen = false;
+  timerDone = false; pendingResult = null;
   socket.disconnect().connect();
 }
 

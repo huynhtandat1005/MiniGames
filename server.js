@@ -127,12 +127,7 @@ function startChoiceTimer(roomId) {
     room.countdownInterval = null;
     if (!room || room.status !== "playing") return;
 
-    if (room.bothChose) {
-      room.bothChose = false;
-      resolveRound(roomId);
-      return;
-    }
-
+    // Xử lý những người chưa kịp chọn
     room.players.forEach(p => {
       if (!p.choice) {
         p.timedOut = true;
@@ -142,6 +137,7 @@ function startChoiceTimer(roomId) {
       }
     });
 
+    room.bothChose = false;
     resolveRound(roomId);
   }, CHOICE_TIME * 1000);
 }
@@ -260,7 +256,7 @@ io.on("connection", (socket) => {
       const chars      = room.players.map(p => p.charIdx);
       const charLabels = room.players.map(p => charName(p.charIdx));
       logRoom(roomId, "join", playerLabel({ name, charIdx }));
-      log(`[START]\x1b[0m [${roomId}] ${names[0]} (${charLabels[0]}) VS ${names[1]} (${charLabels[1]})`);
+      log(`\x1b[0m [${roomId}] [start] [${names[0]} (${charLabels[0]}) VS ${names[1]} (${charLabels[1]})]`);
       io.to(roomId).emit("gameStart", { players: names, round: room.round, chars });
 
       setTimeout(() => {
@@ -298,6 +294,9 @@ io.on("connection", (socket) => {
 
     if (room.players.every(p => p.choice)) {
       room.bothChose = true;
+      // Cả hai đã chọn → KHÔNG dừng timer, để đếm ngược chạy hết
+      // Server sẽ resolve trong timeout handler khi hết giờ
+      io.to(roomId).emit("bothChosen");
     }
   });
 
@@ -325,7 +324,7 @@ io.on("connection", (socket) => {
     if (!room) return;
     if (!room.rematchVotes) room.rematchVotes = new Set();
     room.rematchVotes.add(socket.id);
-    log(`🔄 ${pInfo.name} wants to rematch — room ${roomId}`);
+    log(`[${roomId}] [request rematch] [${playerLabel(pInfo)}]`);
 
     if (room.rematchVotes.size >= 2) {
       room.rematchVotes.clear();
@@ -346,7 +345,7 @@ io.on("connection", (socket) => {
       setTimeout(() => {
         if (rooms[roomId]) io.to(roomId).emit("roundBegin", { round: 1 });
       }, 3500);
-      log(`🔄 Chơi lại — ${roomInfo(roomId)}`);
+      log(`[${roomId}] [rematch] ${room.players.map(p => playerLabel(p)).join(" vs ")}`);
     } else {
       socket.to(roomId).emit("rematchRequest", pInfo.name);
     }
