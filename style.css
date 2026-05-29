@@ -69,7 +69,7 @@ input[type=text],textarea,select { touch-action:pan-x pan-y; }
 ══════════════════════════════════════════════════════════ */
 .wrap {
   position:relative; z-index:1;
-  width:100%; height:100%;
+  width:80%; height:100%;
   max-width:960px; max-height:540px;
   display:flex; flex-direction:column;   /* dọc: logo trên, content dưới */
   gap:8px;
@@ -168,11 +168,12 @@ input[type=text]::placeholder { color:var(--muted); font-weight:400; }
 .btn-ghost { background:transparent; border:1.5px solid var(--border); color:var(--muted); box-shadow:none; }
 .btn-ghost:hover { border-color:var(--muted); color:var(--text); }
 .btn-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.btn-success { background:linear-gradient(135deg,#16a34a,#22d3a5); color:#fff; box-shadow:0 3px 12px #22d3a560; }
 
 /* Bên phải: char picker 2×2 */
 .char-section {
   display:flex; flex-direction:column;
-  flex-shrink:0; width:300px;
+  flex-shrink:0; width:260px;
 }
 .char-section-label {
   font-size:.62rem; font-weight:700; text-transform:uppercase;
@@ -180,7 +181,7 @@ input[type=text]::placeholder { color:var(--muted); font-weight:400; }
 }
 .char-grid {
   display:grid; grid-template-columns:repeat(2,1fr);
-  gap:10px; flex:1;
+  gap:20px; flex:1;
 }
 .char-card {
   border-radius:12px; border:2px solid var(--border);
@@ -199,11 +200,18 @@ input[type=text]::placeholder { color:var(--muted); font-weight:400; }
 .char-card.selected .cname { color:var(--yellow); }
 
 /* ══════════════════════════════════════════════════════════
-   WAITING SCREEN
+   LOBBY PANELS — room badge & join input (inline, replaces screen-wait)
 ══════════════════════════════════════════════════════════ */
-#screen-wait {
-  flex:1; flex-direction:column;
-  align-items:center; justify-content:center; gap:14px;
+.lobby-panel {
+  animation: fadeSlideIn .2s ease;
+}
+@keyframes fadeSlideIn {
+  from { opacity:0; transform:translateY(-6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.lobby-join-err {
+  color:var(--red); font-size:.78rem; text-align:center;
+  min-height:18px; font-weight:700; margin-top:4px;
 }
 .room-badge {
   text-align:center; background:var(--surface); border:1.5px dashed var(--border);

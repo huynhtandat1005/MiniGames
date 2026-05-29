@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 100">
+  <!-- Fox (currently unused) -->
+  <path d="M52 72 Q70 78 72 90 Q66 96 60 88 Q55 80 52 72Z" fill="#ef6c00"/>
+  <path d="M52 72 Q68 80 68 90 Q65 94 60 88 Q56 81 52 72Z" fill="#fff3e0" opacity=".7"/>
+  <ellipse cx="36" cy="63" rx="20" ry="22" fill="#f57c00"/>
+  <ellipse cx="36" cy="66" rx="12" ry="14" fill="#fff3e0"/>
+  <rect x="24" y="78" width="11" height="16" rx="4" fill="#e65100"/>
+  <rect x="40" y="78" width="11" height="16" rx="4" fill="#e65100"/>
+  <ellipse cx="29" cy="94" rx="6"  ry="3" fill="#bf360c"/>
+  <ellipse cx="46" cy="94" rx="6"  ry="3" fill="#bf360c"/>
+  <path d="M18 58 Q8 54 6 62 Q10 68 20 64Z"  fill="#f57c00"/>
+  <path d="M54 58 Q64 54 74 62 Q70 68 60 64Z" fill="#f57c00"/>
+  <ellipse cx="36" cy="40" rx="13" ry="8" fill="#f57c00"/>
+  <ellipse cx="38" cy="26" rx="20" ry="18" fill="#fb8c00"/>
+  <polygon points="22,16 16,2 28,12"  fill="#f57c00"/>
+  <polygon points="24,14 20,6  27,12" fill="#e91e63"/>
+  <polygon points="54,16 62,2 50,12"  fill="#f57c00"/>
+  <polygon points="52,14 58,6  51,12" fill="#e91e63"/>
+  <ellipse cx="38" cy="29" rx="13" ry="11" fill="#fff3e0"/>
+  <ellipse cx="32" cy="24" rx="5" ry="5" fill="#1a1a2e"/>
+  <ellipse cx="44" cy="24" rx="5" ry="5" fill="#1a1a2e"/>
+  <circle cx="31" cy="23" r="1.5" fill="#fff" opacity=".8"/>
+  <circle cx="43" cy="23" r="1.5" fill="#fff" opacity=".8"/>
+  <ellipse cx="38" cy="30" rx="3" ry="2" fill="#bf360c"/>
+  <path d="M34 33 Q38 37 42 33" stroke="#bf360c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <line x1="20" y1="30" x2="32" y2="31" stroke="#bf360c" stroke-width="1" opacity=".6"/>
+  <line x1="20" y1="34" x2="32" y2="33" stroke="#bf360c" stroke-width="1" opacity=".6"/>
+  <line x1="44" y1="31" x2="56" y2="30" stroke="#bf360c" stroke-width="1" opacity=".6"/>
+  <line x1="44" y1="33" x2="56" y2="34" stroke="#bf360c" stroke-width="1" opacity=".6"/>
+</svg>

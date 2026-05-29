@@ -204,17 +204,17 @@ io.on("connection", (socket) => {
 
     if (!isCreating) {
       if (!rooms[roomId]) {
-        socket.emit("error", "Phòng không tồn tại!");
+        socket.emit("error", "Phòng không tồn tại");
         log(`X ${name} enter wrong room ID: ${roomId}`);
         return;
       }
       if (rooms[roomId].status !== "waiting") {
-        socket.emit("error", "Phòng đã bắt đầu!");
+        socket.emit("error", "Phòng đã bắt đầu");
         log(`X ${name} tried to enter a room that is already in progress: ${roomId}`);
         return;
       }
       if (rooms[roomId].players.length >= 2) {
-        socket.emit("error", "Phòng đã đầy (2/2)!");
+        socket.emit("error", "Phòng đã đầy (2/2)");
         log(`X ${name} tried to enter a full room: ${roomId}`);
         return;
       }
@@ -235,7 +235,7 @@ io.on("connection", (socket) => {
         p.name.trim().toLowerCase() === name.trim().toLowerCase()
     );
     if (duplicated) {
-      socket.emit("error", "Tên người chơi này đang được sử dụng!");
+      socket.emit("error", "Tên người chơi này đang được sử dụng");
       delete players[socket.id];
       return;
     }
@@ -256,7 +256,7 @@ io.on("connection", (socket) => {
       const chars      = room.players.map(p => p.charIdx);
       const charLabels = room.players.map(p => charName(p.charIdx));
       logRoom(roomId, "join", playerLabel({ name, charIdx }));
-      log(`\x1b[0m [${roomId}] [start] [${names[0]} (${charLabels[0]}) VS ${names[1]} (${charLabels[1]})]`);
+      log(`\x1b[0m[${roomId}] [start] [${names[0]} (${charLabels[0]}) VS ${names[1]} (${charLabels[1]})]`);
       io.to(roomId).emit("gameStart", { players: names, round: room.round, chars });
 
       setTimeout(() => {
@@ -364,7 +364,7 @@ io.on("connection", (socket) => {
         delete room.scores[socket.id];
         if (room.players.length === 0) {
           delete rooms[roomId];
-          logRoom(roomId, "closed", `${name} disconnected, room closed`);
+          logRoom("DELETED", roomId, "all players left");
         } else {
           room.status = "waiting";
           io.to(roomId).emit("playerLeft", name);

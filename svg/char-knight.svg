@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 100">
+  <!-- Knight -->
+  <rect x="24" y="70" width="13" height="20" rx="3" fill="#607d8b"/>
+  <rect x="43" y="70" width="13" height="20" rx="3" fill="#607d8b"/>
+  <rect x="20" y="43" width="40" height="30" rx="5" fill="#78909c"/>
+  <rect x="25" y="46" width="30" height="22" rx="4" fill="#90a4ae"/>
+  <rect x="38" y="49" width="4" height="13" rx="1" fill="#e53935"/>
+  <rect x="33" y="54" width="14" height="4"  rx="1" fill="#e53935"/>
+  <ellipse cx="20" cy="46" rx="9" ry="7" fill="#607d8b"/>
+  <ellipse cx="60" cy="46" rx="9" ry="7" fill="#607d8b"/>
+  <rect x="7"  y="44" width="14" height="9" rx="4" fill="#78909c"/>
+  <rect x="59" y="44" width="14" height="9" rx="4" fill="#78909c"/>
+  <rect x="23" y="14" width="34" height="30" rx="8" fill="#607d8b"/>
+  <rect x="23" y="14" width="34" height="14" rx="8" fill="#546e7a"/>
+  <rect x="27" y="26" width="26" height="5" rx="2" fill="#1a1a2e"/>
+  <path d="M40 6 Q38 12 36 14 L44 14 Q42 12 40 6Z" fill="#e53935"/>
+  <rect x="65" y="15" width="4"  height="40" rx="1" fill="#c0c0c0"/>
+  <rect x="60" y="37" width="14" height="4"  rx="1" fill="#ffd700"/>
+  <rect x="66" y="12" width="2"  height="5"  rx="1" fill="#ffd700"/>
+  <path d="M10 42 L10 62 Q10 72 18 74 Q18 62 18 42Z" fill="#e53935"/>
+  <path d="M14 45 L14 66" stroke="#ffd700" stroke-width="1.5"/>
+</svg>
