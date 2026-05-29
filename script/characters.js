@@ -1,10 +1,10 @@
 const CHARS = [
-  { id: 'ninja',   name: 'Ninja',   symbol: '#char-ninja'   },
-  { id: 'mage',    name: 'Mage',    symbol: '#char-mage'    },
-  { id: 'knight',  name: 'Knight',  symbol: '#char-knight'  },
-  { id: 'robot',   name: 'Robot',   symbol: '#char-robot'   },
-//   { id: 'dragon',  name: 'Dragon',  symbol: '#char-dragon'  },
-//   { id: 'fox',     name: 'Fox',     symbol: '#char-fox'     },
+  { id: 'ninja',  name: 'Ninja'  },
+  { id: 'mage',   name: 'Mage'   },
+  { id: 'gunner', name: 'Gunner' },
+  { id: 'robot',  name: 'Robot'  },
+  { id: 'dragon', name: 'Dragon' },
+  { id: 'archer', name: 'Archer' },
 ];
 
 let myCharIdx = 0; // Chỉ số nhân vật được người chơi chọn ban đầu
@@ -13,7 +13,7 @@ function buildCharGrid() {
   const grid = document.getElementById('char-grid');
   grid.innerHTML = CHARS.map((c, i) => `
     <button class="char-card${i === 0 ? ' selected' : ''}" onclick="selectChar(${i})" aria-label="${c.name}">
-      <svg viewBox="0 0 80 100"><use href="${c.symbol}"/></svg>
+      <img src="/img/${c.id}.png" alt="${c.name}" width="80" height="100">
       <span class="cname">${c.name}</span>
     </button>`).join('');
 }
@@ -27,7 +27,7 @@ function selectChar(idx) {
 function setAvatarSVG(elId, charIdx) {
   const el = document.getElementById(elId);
   if (el && CHARS[charIdx]) {
-    el.innerHTML = `<svg viewBox="0 0 80 100"><use href="${CHARS[charIdx].symbol}"/></svg>`;
+    el.innerHTML = `<img src="/img/${CHARS[charIdx].id}.png" alt="${CHARS[charIdx].name}" width="80" height="100">`;
   }
 }
 

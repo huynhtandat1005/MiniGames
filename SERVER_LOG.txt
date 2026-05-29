@@ -1,0 +1,311 @@
+
+────────────────────────────────────────────────────────────
+[18:30:59 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[18:30:59 29/5/2026] + Connected: Z4z3Dt_rHtyiFmGEAAAB
+[18:31:01 29/5/2026] + Connected: oPSQkVX0UGI362AXAAAD
+[18:31:03 29/5/2026] + Connected: UZgaQh-i3bYUbEqMAAAF
+[18:31:03 29/5/2026] - Disconnected: UZgaQh-i3bYUbEqMAAAF
+[18:31:03 29/5/2026] + Connected: asx88pNBsHZ3uHzCAAAH
+[18:31:08 29/5/2026] [create] [dat (Robot)] [Room ID: J5BX]
+[18:31:16 29/5/2026] [J5BX] [start] [dat (Robot) VS saff (Char5)]
+[18:31:16 29/5/2026] [J5BX] [join] [saff (Char5)]
+[18:31:24 29/5/2026] [J5BX] [chosen (ROCK)] [dat (Robot)]
+[18:31:25 29/5/2026] [J5BX] [chosen (PAPER)] [saff (Char5)]
+[18:31:33 29/5/2026] [J5BX] [result] [dat (Robot)(ROCK) < saff (Char5)(PAPER)]
+
+────────────────────────────────────────────────────────────
+[18:36:36 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[18:36:38 29/5/2026] + Connected: CvtgwJucks3kE3AtAAAB
+[18:36:39 29/5/2026] + Connected: 5ZBCvh82FpthxycjAAAD
+[18:36:39 29/5/2026] - Disconnected: 5ZBCvh82FpthxycjAAAD
+[18:36:40 29/5/2026] + Connected: dEA2lDCyNtFyVxqUAAAF
+
+────────────────────────────────────────────────────────────
+[18:37:58 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[18:38:02 29/5/2026] + Connected: vgxZ5Yl2P2e1uiDtAAAC
+[18:38:02 29/5/2026] + Connected: N1S9mFigu5ayHyf4AAAD
+[18:38:02 29/5/2026] - Disconnected: vgxZ5Yl2P2e1uiDtAAAC
+[18:38:02 29/5/2026] - Disconnected: N1S9mFigu5ayHyf4AAAD
+[18:38:02 29/5/2026] + Connected: 5CdYkCM4kEAnKzOYAAAF
+[18:38:04 29/5/2026] + Connected: Vd-QqvpXmY27ZHEzAAAH
+[18:38:04 29/5/2026] - Disconnected: Vd-QqvpXmY27ZHEzAAAH
+[18:38:04 29/5/2026] + Connected: OWIVYgvODJSje7uWAAAJ
+[18:38:06 29/5/2026] [create] [dat (Ninja)] [Room ID: JRNU]
+[18:38:23 29/5/2026] + Connected: u_HcOLcbVeIOuZ0BAAAL
+[18:38:23 29/5/2026] - Disconnected: u_HcOLcbVeIOuZ0BAAAL
+[18:38:23 29/5/2026] + Connected: GViDKNm5uxwIjH1QAAAN
+[18:38:27 29/5/2026] [JRNU] [join] [sadaf (Char4)]
+[18:38:27 29/5/2026] [JRNU] [start] [dat (Ninja) VS sadaf (Char4)]
+[18:38:35 29/5/2026] [JRNU] [chosen (ROCK)] [dat (Ninja)]
+[18:38:36 29/5/2026] [JRNU] [chosen (PAPER)] [sadaf (Char4)]
+[18:38:44 29/5/2026] [JRNU] [result] [dat (Ninja)(ROCK) < sadaf (Char4)(PAPER)]
+[18:38:53 29/5/2026] [JRNU] [request rematch] [dat (Ninja)]
+[18:38:55 29/5/2026] [JRNU] [request rematch] [sadaf (Ninja)]
+[18:38:55 29/5/2026] [JRNU] [rematch] [dat (Ninja) vs sadaf (Char4)]
+[18:38:55 29/5/2026] [JRNU] [rematch] dat (Ninja) vs sadaf (Char4)
+[18:39:03 29/5/2026] [JRNU] [chosen (SCISSORS)] [dat (Ninja)]
+[18:39:12 29/5/2026] [JRNU] [timeout] [sadaf (Char4)]
+[18:39:12 29/5/2026] [JRNU] [result] [dat (Ninja)(SCISSORS) > sadaf (Char4)(TIMEOUT)]
+[18:39:32 29/5/2026] + Connected: xsQAWbXrP4aLo0TEAAAP
+[18:39:33 29/5/2026] + Connected: -b0RppN1JRxqF89SAAAR
+[18:39:45 29/5/2026] - Disconnected: dat
+[18:39:45 29/5/2026] [JRNU] [leave] [dat (Ninja)]
+[18:39:45 29/5/2026] + Connected: AyAYsXUn_bAFyc0yAAAT
+[18:39:47 29/5/2026] - Disconnected: sadaf
+[18:39:47 29/5/2026] [deleted] [Room ID: JRNU] [all players left]
+
+────────────────────────────────────────────────────────────
+[18:40:20 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[18:40:20 29/5/2026] + Connected: R_uk465TjExkkEBHAAAC
+[18:40:20 29/5/2026] + Connected: 25V6vCvtzgdltIVKAAAD
+[18:40:20 29/5/2026] + Connected: vKen7ZE1g4iOutyhAAAF
+[18:40:21 29/5/2026] - Disconnected: vKen7ZE1g4iOutyhAAAF
+[18:40:22 29/5/2026] + Connected: UNIxunVxhx6tSbmxAAAH
+[18:40:31 29/5/2026] [create] [Dat (Ninja)] [Room ID: LFNG]
+[18:40:42 29/5/2026] - Disconnected: 25V6vCvtzgdltIVKAAAD
+[18:40:42 29/5/2026] - Disconnected: R_uk465TjExkkEBHAAAC
+[18:40:42 29/5/2026] + Connected: bywiw83TMX_sa09lAAAJ
+[18:40:46 29/5/2026] [LFNG] [start] [Dat (Ninja) VS asfas (Ninja)]
+[18:40:46 29/5/2026] [LFNG] [join] [asfas (Ninja)]
+[18:40:55 29/5/2026] [LFNG] [chosen (ROCK)] [Dat (Ninja)]
+[18:40:57 29/5/2026] [LFNG] [chosen (SCISSORS)] [asfas (Ninja)]
+[18:41:03 29/5/2026] [LFNG] [result] [Dat (Ninja)(ROCK) > asfas (Ninja)(SCISSORS)]
+[18:41:14 29/5/2026] - Disconnected: Dat
+[18:41:14 29/5/2026] [LFNG] [leave] [Dat (Ninja)]
+[18:41:14 29/5/2026] + Connected: _H1vrnVNmKvOvziAAAAL
+[18:41:17 29/5/2026] - Disconnected: asfas
+[18:41:17 29/5/2026] [deleted] [Room ID: LFNG] [all players left]
+[18:41:17 29/5/2026] + Connected: 6pq3T8Ir5obNyuYEAAAN
+
+────────────────────────────────────────────────────────────
+[18:43:06 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[18:43:09 29/5/2026] + Connected: dOyhYOiEjS8nGBK3AAAE
+[18:43:10 29/5/2026] + Connected: cgZkUsV_qsc2rdyrAAAG
+[18:43:18 29/5/2026] [create] [Dat (Ninja)] [Room ID: HCGR]
+
+────────────────────────────────────────────────────────────
+[18:43:37 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[18:43:38 29/5/2026] + Connected: RAxQs9cFQEsJyBYrAAAB
+[18:43:39 29/5/2026] + Connected: pOCmVLHXw5bWtkE7AAAD
+[18:43:40 29/5/2026] [create] [dat (Ninja)] [Room ID: H9PX]
+
+────────────────────────────────────────────────────────────
+[18:44:57 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[18:44:58 29/5/2026] + Connected: OVIS6voGBmfldlbBAAAB
+[18:44:58 29/5/2026] + Connected: 9CrKTsuZfHbruhHqAAAD
+[18:44:59 29/5/2026] - Disconnected: 9CrKTsuZfHbruhHqAAAD
+[18:44:59 29/5/2026] + Connected: 3rFKw5ouoQjDUpIUAAAF
+[18:45:04 29/5/2026] [create] [Dsss (Ninja)] [Room ID: XXLH]
+
+────────────────────────────────────────────────────────────
+[18:46:04 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[18:46:04 29/5/2026] + Connected: 0qhifULzv8apSeEjAAAB
+[18:46:07 29/5/2026] + Connected: w2Tn9TGx9f5i8zwWAAAD
+[18:46:11 29/5/2026] [create] [dat (Ninja)] [Room ID: 8R2O]
+
+────────────────────────────────────────────────────────────
+[18:46:31 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[18:46:31 29/5/2026] + Connected: -xPaYu-1AlHoF7lYAAAB
+[18:46:32 29/5/2026] + Connected: uV92eV6WL4LFVBXOAAAD
+[18:46:32 29/5/2026] - Disconnected: uV92eV6WL4LFVBXOAAAD
+[18:46:33 29/5/2026] + Connected: 6KHapu_SH9QM7o61AAAF
+[18:46:34 29/5/2026] [create] [dat (Ninja)] [Room ID: 12HY]
+[18:46:39 29/5/2026] - Disconnected: -xPaYu-1AlHoF7lYAAAB
+[18:46:39 29/5/2026] + Connected: wA0OkuLuMMP3nGZpAAAH
+[18:46:58 29/5/2026] [create] [Datf (Ninja)] [Room ID: GL6R]
+[18:47:12 29/5/2026] - Disconnected: dat
+[18:47:12 29/5/2026] [deleted] [Room ID: 12HY] [all players left]
+[18:47:12 29/5/2026] + Connected: 0Te368-6zlucFARNAAAJ
+[18:47:18 29/5/2026] [GL6R] [join] [dat (Char4)]
+[18:47:18 29/5/2026] [GL6R] [start] [Datf (Ninja) VS dat (Char4)]
+[18:47:28 29/5/2026] [GL6R] [chosen (ROCK)] [dat (Char4)]
+[18:47:32 29/5/2026] [GL6R] [chosen (ROCK)] [Datf (Ninja)]
+[18:47:36 29/5/2026] [GL6R] [result] [Datf (Ninja)(ROCK) = dat (Char4)(ROCK)]
+[18:47:38 29/5/2026] - Disconnected: dat
+[18:47:38 29/5/2026] [GL6R] [leave] [dat (Char4)]
+[18:47:38 29/5/2026] + Connected: F0FmxG3yf8i8Z8-UAAAL
+[18:47:40 29/5/2026] - Disconnected: Datf
+[18:47:40 29/5/2026] [deleted] [Room ID: GL6R] [all players left]
+[18:47:40 29/5/2026] + Connected: TIZ8Q5MbBsUN__4YAAAN
+[18:47:41 29/5/2026] - Disconnected: TIZ8Q5MbBsUN__4YAAAN
+[18:47:41 29/5/2026] + Connected: YQDCjiSE_MvvKlMSAAAP
+
+────────────────────────────────────────────────────────────
+[18:48:34 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[18:48:34 29/5/2026] + Connected: 5YDFVYkkQ3mVZyhfAAAB
+[18:48:35 29/5/2026] + Connected: bSO5KAXc3edwQmBcAAAD
+[18:48:37 29/5/2026] - Disconnected: bSO5KAXc3edwQmBcAAAD
+[18:48:37 29/5/2026] + Connected: N64bo1wEZAMXLp9-AAAH
+[18:48:41 29/5/2026] [create] [Tfc (Ninja)] [Room ID: 6MTD]
+[18:48:56 29/5/2026] - Disconnected: 5YDFVYkkQ3mVZyhfAAAB
+[18:48:56 29/5/2026] + Connected: JutkHPtjw5sucYz3AAAJ
+[18:49:07 29/5/2026] [6MTD] [join] [sfaf (Char5)]
+[18:49:07 29/5/2026] [6MTD] [start] [Tfc (Ninja) VS sfaf (Char5)]
+[18:49:15 29/5/2026] [6MTD] [chosen (ROCK)] [Tfc (Ninja)]
+[18:49:24 29/5/2026] [6MTD] [timeout] [sfaf (Char5)]
+[18:49:24 29/5/2026] [6MTD] [result] [Tfc (Ninja)(ROCK) > sfaf (Char5)(TIMEOUT)]
+[18:49:28 29/5/2026] - Disconnected: Tfc
+[18:49:28 29/5/2026] [6MTD] [leave] [Tfc (Ninja)]
+[18:49:28 29/5/2026] + Connected: sZF2RNjL0wO70HnuAAAL
+[18:49:28 29/5/2026] - Disconnected: sfaf
+[18:49:28 29/5/2026] [deleted] [Room ID: 6MTD] [all players left]
+[18:49:28 29/5/2026] + Connected: 6QGvAy1lxMPBeip4AAAN
+[18:49:30 29/5/2026] - Disconnected: 6QGvAy1lxMPBeip4AAAN
+[18:49:30 29/5/2026] + Connected: UKsjZjs-6XGN42q2AAAP
+
+────────────────────────────────────────────────────────────
+[18:50:33 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[18:50:35 29/5/2026] + Connected: i80CQDNTwTvZZfOYAAAB
+[18:50:38 29/5/2026] + Connected: jT_OQWMF4dsf4cbyAAAD
+[18:50:40 29/5/2026] [create] [Đs (Ninja)] [Room ID: OJ4G]
+
+────────────────────────────────────────────────────────────
+[18:50:49 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[18:50:50 29/5/2026] + Connected: HDAEGPlsAoFMmH90AAAB
+[18:50:51 29/5/2026] + Connected: QIRuZj6F24_rHLskAAAD
+[18:50:53 29/5/2026] [create] [Ee (Ninja)] [Room ID: AMSW]
+
+────────────────────────────────────────────────────────────
+[18:51:09 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[18:51:09 29/5/2026] + Connected: cnSW0ddKBHiUkMGKAAAB
+[18:51:09 29/5/2026] + Connected: qd2ZPZACXdYqonbxAAAD
+[18:51:13 29/5/2026] - Disconnected: cnSW0ddKBHiUkMGKAAAB
+[18:51:13 29/5/2026] + Connected: 35gGAOIExopNSqm7AAAF
+[18:51:18 29/5/2026] [create] [Đsfff (Ninja)] [Room ID: FDKX]
+
+────────────────────────────────────────────────────────────
+[18:51:55 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[18:51:55 29/5/2026] + Connected: -xI-Ttu9vvskZvnGAAAB
+[18:51:55 29/5/2026] + Connected: 3WQB6vy2SISn8ybvAAAD
+[18:51:56 29/5/2026] - Disconnected: 3WQB6vy2SISn8ybvAAAD
+[18:51:56 29/5/2026] + Connected: 8uiIAnNxgB6jvNd9AAAF
+[18:51:58 29/5/2026] [create] [Dd (Ninja)] [Room ID: G90H]
+
+────────────────────────────────────────────────────────────
+[18:52:17 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[18:52:19 29/5/2026] + Connected: mN8rVgYwz67GGtV3AAAB
+[18:52:21 29/5/2026] [create] [dafa (Ninja)] [Room ID: 941W]
+[18:52:21 29/5/2026] + Connected: xoAWhHKqoe8JXLcEAAAD
+
+────────────────────────────────────────────────────────────
+[18:53:13 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[18:53:13 29/5/2026] + Connected: 0WPhO56xN0fqTk3XAAAB
+[18:53:13 29/5/2026] + Connected: sL7R6GQ_PU9JFiXTAAAD
+[18:53:17 29/5/2026] - Disconnected: 0WPhO56xN0fqTk3XAAAB
+[18:53:17 29/5/2026] + Connected: -c65k8s2RI4noaUkAAAF
+[18:53:18 29/5/2026] [create] [daat (Ninja)] [Room ID: 7RTF]
+[18:53:28 29/5/2026] - Disconnected: sL7R6GQ_PU9JFiXTAAAD
+[18:53:28 29/5/2026] + Connected: 3J7yofhzUeLk8hKOAAAH
+[18:53:35 29/5/2026] [create] [Fff (Ninja)] [Room ID: H5A3]
+[18:53:38 29/5/2026] - Disconnected: Fff
+[18:53:38 29/5/2026] [deleted] [Room ID: H5A3] [all players left]
+[18:53:38 29/5/2026] + Connected: zar-w2-owpCLTLaTAAAJ
+[18:53:42 29/5/2026] [create] [Fff (Ninja)] [Room ID: 4MJX]
+
+────────────────────────────────────────────────────────────
+[18:59:38 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[18:59:39 29/5/2026] + Connected: MJfBAqEY5Unj2yjjAAAD
+[18:59:40 29/5/2026] + Connected: amKqs78NUBEcHG5sAAAF
+[18:59:42 29/5/2026] - Disconnected: MJfBAqEY5Unj2yjjAAAD
+[18:59:42 29/5/2026] + Connected: u218qHkzC66832oEAAAN
+[19:01:14 29/5/2026] - Disconnected: u218qHkzC66832oEAAAN
+[19:01:14 29/5/2026] + Connected: HFTk4RZVz2IToREiAAAP
+[19:01:15 29/5/2026] - Disconnected: HFTk4RZVz2IToREiAAAP
+[19:01:15 29/5/2026] + Connected: MgE17MtmI0tAfpPpAAAR
+[19:01:15 29/5/2026] - Disconnected: MgE17MtmI0tAfpPpAAAR
+[19:01:15 29/5/2026] + Connected: jSLBP6_dBc3WnsABAAAT
+[19:01:15 29/5/2026] - Disconnected: jSLBP6_dBc3WnsABAAAT
+[19:01:15 29/5/2026] + Connected: rLfAsrpl0mFXjLxAAAAV
+
+────────────────────────────────────────────────────────────
+[19:01:54 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[19:01:54 29/5/2026] + Connected: CRJSDzZ0rGKJpFOvAAAB
+[19:01:56 29/5/2026] [create] [dat (Ninja)] [Room ID: D8AD]
+[19:01:56 29/5/2026] + Connected: apSOUocY9ApyFAklAAAE
+[19:01:59 29/5/2026] - Disconnected: apSOUocY9ApyFAklAAAE
+[19:02:00 29/5/2026] + Connected: vW4-hVFrVyUr47DfAAAG
+[19:02:03 29/5/2026] - Disconnected: dat
+[19:02:03 29/5/2026] [deleted] [Room ID: D8AD] [all players left]
+[19:02:03 29/5/2026] + Connected: 0QrEVuut2DhVsW74AAAI
+[19:02:06 29/5/2026] [create] [Dat (Ninja)] [Room ID: BDK5]
+
+────────────────────────────────────────────────────────────
+[19:02:59 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[19:02:59 29/5/2026] + Connected: hNVGoAQ1Ee5X014GAAAC
+[19:03:00 29/5/2026] - Disconnected: hNVGoAQ1Ee5X014GAAAC
+[19:03:01 29/5/2026] + Connected: vPhrevC2P507cEcXAAAE
+[19:03:02 29/5/2026] + Connected: ubXITSp5II032mSgAAAG
+
+────────────────────────────────────────────────────────────
+[19:03:18 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[19:03:19 29/5/2026] + Connected: 8cUyQEFg8TwvsQEHAAAB
+[19:03:21 29/5/2026] + Connected: tx8KY39DPLQNpS4BAAAD
+
+────────────────────────────────────────────────────────────
+[19:03:54 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[19:03:55 29/5/2026] + Connected: NSjrd6SeZvScXSrUAAAB
+[19:03:56 29/5/2026] + Connected: YyraUZb2QE2cpWxiAAAD
+
+────────────────────────────────────────────────────────────
+[19:04:25 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[19:04:25 29/5/2026] + Connected: tE-NqLea7VfMx_80AAAB
+[19:04:26 29/5/2026] + Connected: W6CvYkgbpF1nbag4AAAD
+[19:04:33 29/5/2026] [create] [Dat (Ninja)] [Room ID: 3JCJ]
+
+────────────────────────────────────────────────────────────
+[19:05:46 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[19:05:49 29/5/2026] + Connected: CGtQbFWbzEkGm1FVAAAB
+[19:05:49 29/5/2026] - Disconnected: CGtQbFWbzEkGm1FVAAAB
+[19:05:49 29/5/2026] + Connected: t1JXAuO-4aQunHkhAAAD
+[19:05:50 29/5/2026] + Connected: c50YfYLbZ_9b96mHAAAF
+[19:05:51 29/5/2026] - Disconnected: t1JXAuO-4aQunHkhAAAD
+[19:05:51 29/5/2026] + Connected: 6M76oX0HGeokVdYLAAAH
+[19:06:03 29/5/2026] [create] [S (Mage)] [Room ID: KQ90]
+[19:06:12 29/5/2026] - Disconnected: S
+[19:06:12 29/5/2026] [deleted] [Room ID: KQ90] [all players left]
+[19:06:12 29/5/2026] + Connected: EdGSCMpawe7uPqLoAAAJ
+
+────────────────────────────────────────────────────────────
+[19:06:47 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[19:06:49 29/5/2026] + Connected: vQYDWQ2usxi2J35rAAAB
+[19:06:51 29/5/2026] + Connected: VTIfFCkBaQY-OHJvAAAD
+[19:06:59 29/5/2026] [create] [Dat (Ninja)] [Room ID: KHSL]
+[19:07:01 29/5/2026] - Disconnected: Dat
+[19:07:01 29/5/2026] [deleted] [Room ID: KHSL] [all players left]
+[19:07:01 29/5/2026] + Connected: M8VC6gEeVU5bWxDOAAAF
+
+────────────────────────────────────────────────────────────
+[19:08:11 29/5/2026] SERVER STARTED — http://localhost:3000
+────────────────────────────────────────────────────────────
+[19:08:12 29/5/2026] + Connected: gFUenG6zwtWokjmtAAAB
+[19:08:13 29/5/2026] + Connected: Rs2bUkcwWjIfeth3AAAD
+[19:08:18 29/5/2026] [create] [Dat (Char4)] [Room ID: H27Q]
+[19:08:31 29/5/2026] [H27Q] [join] [tam (Char5)]
+[19:08:31 29/5/2026] [H27Q] [start] [Dat (Char4) VS tam (Char5)]
+[19:08:39 29/5/2026] [H27Q] [chosen (PAPER)] [tam (Char5)]
+[19:08:44 29/5/2026] [H27Q] [chosen (SCISSORS)] [Dat (Char4)]
+[19:08:48 29/5/2026] [H27Q] [result] [Dat (Char4)(SCISSORS) > tam (Char5)(PAPER)]

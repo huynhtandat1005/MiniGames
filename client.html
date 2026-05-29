@@ -20,23 +20,21 @@
   <small>Trò chơi được tối ưu cho màn hình ngang</small>
 </div>
 
-<!-- Character SVGs — symbols are loaded by gameLogic.js → loadCharacterSprites() -->
-<svg style="display:none" id="char-svgs"></svg>
-
+<!-- Character PNGs are set dynamically by gameLogic.js → loadCharacterSprites() -->
 
 <div id="start-overlay">
   <div class="start-round-label" id="start-round-label">TRẬN ĐẤU BẮT ĐẦU</div>
   <div class="start-vs-row">
     <div class="start-fighter p1-side" id="start-fighter-p1">
       <div class="start-fighter-char p1-side" id="start-char-p1">
-        <svg viewBox="0 0 80 100"><use href="#char-ninja"/></svg>
+        <img src="/img/ninja.png" alt="ninja" width="90" height="100">
       </div>
       <div class="start-name p1" id="start-p1">Player 1</div>
     </div>
     <div class="start-vs">VS</div>
     <div class="start-fighter p2-side" id="start-fighter-p2">
       <div class="start-fighter-char p2-side" id="start-char-p2">
-        <svg viewBox="0 0 80 100"><use href="#char-ninja"/></svg>
+        <img src="/img/ninja.png" alt="ninja" width="90" height="100">
       </div>
       <div class="start-name p2" id="start-p2">Player 2</div>
     </div>
@@ -73,7 +71,7 @@
           <small>Mã phòng của bạn</small>
           <div class="room-id" id="lobby-room-id">—</div>
           <small>Chia sẻ mã này cho bạn bè</small>
-          <button class="btn btn-ghost btn-sm" id="btn-copy-room" onclick="copyRoomId()" style="margin-top:8px;width:auto;align-self:center">📋 Sao chép mã</button>
+          <button class="btn btn-ghost btn-sm" id="btn-copy-room" onclick="copyRoomId()" style="margin-top:8px;width:auto;align-self:center">🔗 Sao chép mã</button>
         </div>
         <div class="wait-msg">
           Đang chờ đối thủ
@@ -98,7 +96,7 @@
 
       <div class="btn-row" id="lobby-btn-row">
         <button class="btn btn-success" id="btn-create" onclick="createRoom()"><b>+</b> Tạo phòng</button>
-        <button class="btn btn-secondary" id="btn-join"   onclick="toggleJoinPanel()">🚪 Tham gia</button>
+        <button class="btn btn-secondary" id="btn-join"   onclick="toggleJoinPanel()">🔎 Tham gia</button>
       </div>
 
       <!-- Nút thoát phòng, chỉ hiện khi đang chờ -->
@@ -115,18 +113,16 @@
     <!-- Cột nhân vật - người chơi (trái) -->
     <div class="fighter-col p1-col">
       <div class="fighter-char" id="me-avatar">
-        <svg viewBox="0 0 80 100"><use href="#char-ninja"/></svg>
+        <img src="/img/ninja.png" alt="ninja" width="80" height="100">
       </div>
       <div class="fighter-name" id="me-name">Tôi</div>
     </div>
 
     <!-- Cột giữa: round, timer, nút chọn, hint -->
     <div class="game-center">
-      <div class="vs-divider">VS</div>
-
       <div class="timer-wrap" id="timer-wrap" style="display:none">
-        <div class="timer-bar-bg"><div class="timer-bar-fill" id="timer-bar"></div></div>
         <div class="timer-label" id="timer-label">🕗 10s</div>
+        <div class="timer-bar-bg"><div class="timer-bar-fill" id="timer-bar"></div></div>
       </div>
 
       <div class="choices">
@@ -146,7 +142,7 @@
     <!-- Cột nhân vật - đối thủ (phải) -->
     <div class="fighter-col p2-col">
       <div class="fighter-char" id="opp-avatar">
-        <svg viewBox="0 0 80 100"><use href="#char-ninja"/></svg>
+        <img src="/img/ninja.png" alt="ninja" width="80" height="100">
       </div>
       <div class="fighter-name" id="opp-name">Đối thủ</div>
     </div>

@@ -2,31 +2,6 @@
 // In-match gameplay: start overlay, countdown, choosing, result popup, rematch.
 // Depends on: state.js, timer.js, lobby.js (_resetLobbyPanels, leaveRoom)
 
-// ── SVG character sprites ─────────────────────────────────────────────────────
-// Thêm 'char-dragon' và 'char-fox' vào mảng để kích hoạt các nhân vật đó
-const CHARACTERS = ['char-ninja', 'char-mage', 'char-knight', 'char-robot'];
-
-async function loadCharacterSprites() {
-  const sprite = document.getElementById('char-svgs');
-  await Promise.all(CHARACTERS.map(async (id) => {
-    try {
-      const res     = await fetch(`/svg/${id}.svg`);
-      const svgText = await res.text();
-      const doc     = new DOMParser().parseFromString(svgText, 'image/svg+xml');
-      const svgEl   = doc.querySelector('svg');
-      const symbol  = document.createElementNS('http://www.w3.org/2000/svg', 'symbol');
-      symbol.setAttribute('id', id);
-      symbol.setAttribute('viewBox', svgEl.getAttribute('viewBox') || '0 0 80 100');
-      while (svgEl.firstChild) symbol.appendChild(svgEl.firstChild);
-      sprite.appendChild(symbol);
-    } catch (e) {
-      console.warn(`Could not load ${id}.svg`, e);
-    }
-  }));
-}
-
-document.addEventListener('DOMContentLoaded', () => loadCharacterSprites());
-
 // ── Choice labels ─────────────────────────────────────────────────────────────
 const EMOJI = { rock: '✊', paper: '✋', scissors: '✌️' };
 const VI    = { rock: 'Búa', paper: 'Bao', scissors: 'Kéo' };
@@ -38,11 +13,15 @@ function showStartOverlay(p1Name, p2Name, roundNum, p1Char, p2Char) {
   document.getElementById('start-p1').textContent = p1Name;
   document.getElementById('start-p2').textContent = p2Name;
   if (typeof CHARS !== 'undefined') {
-    document.getElementById('start-char-p1').innerHTML = `<svg viewBox="0 0 80 100"><use href="${CHARS[p1Char].symbol}"/></svg>`;
-    document.getElementById('start-char-p2').innerHTML = `<svg viewBox="0 0 80 100"><use href="${CHARS[p2Char].symbol}"/></svg>`;
+    const c1 = CHARS[p1Char];
+    const c2 = CHARS[p2Char];
+    if (c1) document.getElementById('start-char-p1').innerHTML =
+      `<img src="/img/${c1.id}.png" alt="${c1.name}" width="90" height="100">`;
+    if (c2) document.getElementById('start-char-p2').innerHTML =
+      `<img src="/img/${c2.id}.png" alt="${c2.name}" width="90" height="100">`;
   }
   // Kích hoạt lại animation bằng cách reset lại lớp CSS (null-safe)
-  ['start-p1', 'start-p2', 'start-fighter-p1', 'start-fighter-p2'].forEach(id => {
+  ['start-round-label', 'start-vs', 'start-p1', 'start-p2', 'start-fighter-p1', 'start-fighter-p2'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
@@ -290,3 +269,27 @@ socket.on('playerLeft', (name) => {
   notify(`😢 ${name} đã rời phòng`, 'error', 4000);
   setTimeout(() => leaveRoom(true), 2500);
 });
+
+// ── Lobby lock/unlock ─────────────────────────────────────────────────────────
+function lockLobby() {
+  document.getElementById('inp-name').disabled = true;
+  document.getElementById('char-grid').classList.add('char-grid-disabled');
+}
+function unlockLobby() {
+  document.getElementById('inp-name').disabled = false;
+  document.getElementById('char-grid').classList.remove('char-grid-disabled');
+}
+
+// Patch createRoom để lock sau khi tạo phòng
+const _origCreateRoom = createRoom;
+createRoom = function() {
+  _origCreateRoom.apply(this, arguments);
+  lockLobby();
+};
+
+// Patch leaveRoom để unlock khi thoát phòng
+const _origLeaveRoom = leaveRoom;
+leaveRoom = function() {
+  _origLeaveRoom.apply(this, arguments);
+  unlockLobby();
+};

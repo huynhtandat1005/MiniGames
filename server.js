@@ -248,7 +248,7 @@ io.on("connection", (socket) => {
 
     if (room.players.length === 1) {
       socket.emit("waiting", "Đang chờ đối thủ vào phòng…");
-      logRoom(roomId, "create", playerLabel({ name, charIdx }));
+      logRoom("create", playerLabel({ name, charIdx }), "Room ID: " + roomId);
     } else {
       room.status = "playing";
       room.round  = 1;
@@ -364,7 +364,7 @@ io.on("connection", (socket) => {
         delete room.scores[socket.id];
         if (room.players.length === 0) {
           delete rooms[roomId];
-          logRoom("DELETED", roomId, "all players left");
+          logRoom("deleted", "Room ID: " + roomId, "all players left");
         } else {
           room.status = "waiting";
           io.to(roomId).emit("playerLeft", name);
